@@ -83,8 +83,8 @@ public sealed class Plugin : IDalamudPlugin
 
     private void OnCommand(string command, string args)
     {
-        // in response to the slash command, just toggle the display status of our main ui
-        ToggleMainUI();
+        // in response to the slash command, just toggle the display status of our configuration
+        ToggleConfigUI();
     }
 
     private void DrawUI() => WindowSystem.Draw();
