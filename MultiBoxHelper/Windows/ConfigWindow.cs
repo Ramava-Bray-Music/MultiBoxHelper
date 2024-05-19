@@ -19,7 +19,7 @@ public class ConfigWindow : Window, IDisposable
     // and the window ID will always be "###XYZ counter window" for ImGui
     public ConfigWindow(Plugin plugin) : base("Multibox Helper Configuration###MultiBoxHelperConfiguration")
     {
-        Flags = ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse;
+        Flags = ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoCollapse;
 
         //configuration = plugin.Configuration;
         this.plugin = plugin;
@@ -32,8 +32,9 @@ public class ConfigWindow : Window, IDisposable
     {
         SizeConstraints = new WindowSizeConstraints
         {
-            MinimumSize = new Vector2(800, 400),
-            MaximumSize = ImGuiHelpers.MainViewport.Size * 1 / ImGuiHelpers.GlobalScale * 0.95f
+            MinimumSize = new Vector2(600, 350),
+            MaximumSize = new Vector2(600, 350)
+            //            MaximumSize = ImGuiHelpers.MainViewport.Size * 1 / ImGuiHelpers.GlobalScale * 0.95f
         };
     }
 
@@ -51,10 +52,16 @@ public class ConfigWindow : Window, IDisposable
             // Need to add some buttons below
             // see: https://github.com/Caraxi/Honorific/blob/master/ConfigWindow.cs
 
-
             if (ImGuiComponents.IconButton(FontAwesomeIcon.Plus))
             {
-                // Add a character
+                Service.Log.Debug("Opening add window");
+
+                //window.Position = Position;
+                //window.Position = new Vector2(x: Position.Value.X + (Size.Value.X / 2), y: Position.Value.Y + (Size.Value.Y / 2));
+
+                plugin.AddCloneWindow.Reset();
+                plugin.AddCloneWindow.IsOpen = true;
+                plugin.AddCloneWindow.BringToFront();
             }
             if (ImGui.IsItemHovered())
             {
@@ -93,8 +100,6 @@ public class ConfigWindow : Window, IDisposable
         ImGuiTabBarFlags tabBarFlags = ImGuiTabBarFlags.None;
         if (ImGui.BeginTabBar("SettingsTabBar", tabBarFlags))
         {
-            
-
             if (ImGui.BeginTabItem("Default"))
             {
                 ImGui.Text("Default settings for when it's not specified otherwise.");
@@ -102,7 +107,9 @@ public class ConfigWindow : Window, IDisposable
                 ImGui.Checkbox("Disable Penumbra###DefaultDisablePenumbra", ref plugin.Configuration.DefaultDisablePenumbra);
                 ImGui.Checkbox("Use low graphics mode###efaultLowGraphicsMode", ref plugin.Configuration.DefaultLowGraphicsMode);
 
-                ImGui.Text("\nVisible character limit:");
+                ImGui.NewLine();
+                ImGui.Text("Visible character limit:");
+                ImGui.PushItemWidth(300);
                 ImGui.Combo("###DefaultObjectLimit", ref plugin.Configuration.DefaultObjectLimit, "Maximum\0High\0Normal\0Low\0Minimum\0\0");
 
 
@@ -115,7 +122,9 @@ public class ConfigWindow : Window, IDisposable
                 ImGui.Checkbox("Disable Penumbra###BardDisablePenumbra", ref plugin.Configuration.BardDisablePenumbra);
                 ImGui.Checkbox("Use low graphics mode###efaultLowGraphicsMode", ref plugin.Configuration.BardLowGraphicsMode);
 
-                ImGui.Text("\nVisible character limit:");
+                ImGui.NewLine();
+                ImGui.Text("Visible character limit:");
+                ImGui.PushItemWidth(300);
                 ImGui.Combo("###BardObjectLimit", ref plugin.Configuration.BardObjectLimit, "Maximum\0High\0Normal\0Low\0Minimum\0\0");
 
                 ImGui.EndTabItem();
@@ -128,7 +137,9 @@ public class ConfigWindow : Window, IDisposable
                 ImGui.Checkbox("Disable Penumbra###CloneDisablePenumbra", ref plugin.Configuration.CloneDisablePenumbra);
                 ImGui.Checkbox("Use low graphics mode###efaultLowGraphicsMode", ref plugin.Configuration.CloneLowGraphicsMode);
 
-                ImGui.Text("\nVisible character limit:");
+                ImGui.NewLine();
+                ImGui.Text("Visible character limit:");
+                ImGui.PushItemWidth(300);
                 ImGui.Combo("###CloneObjectLimit", ref plugin.Configuration.CloneObjectLimit, "Maximum\0High\0Normal\0Low\0Minimum\0\0");
 
                 ImGui.EndTabItem();
@@ -136,6 +147,21 @@ public class ConfigWindow : Window, IDisposable
 
             ImGui.EndTabBar();
         }
+
+        ImGui.NewLine();
+        ImGui.NewLine();
+        ImGui.NewLine();
+        ImGui.SameLine(200);
+        if (ImGuiComponents.IconButtonWithText(FontAwesomeIcon.Save, "Save Changes"))
+        {
+            plugin.Configuration.Save();
+            IsOpen = false;
+        }
+        if (ImGui.IsItemHovered())
+        {
+            ImGui.SetTooltip("Save and Close");
+        }
+
         ImGui.EndGroup();
         /*
 
@@ -161,4 +187,11 @@ public class ConfigWindow : Window, IDisposable
     {
         ImGui.Text("Clone List");
     }
+    /*
+    public override void OnClose()
+    {
+        Service.PluginInterface.SavePluginConfig(plugin.Configuration);
+        base.OnClose();
+    }
+    */
 }

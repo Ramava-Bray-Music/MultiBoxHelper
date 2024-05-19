@@ -1,6 +1,7 @@
 using Dalamud.IoC;
 using Dalamud.Plugin.Services;
 using Dalamud.Plugin;
+using System.Numerics;
 
 namespace MultiBoxHelper;
 
@@ -19,4 +20,15 @@ public class Service
     //[PluginService] public static IFramework Framework { get; private set; } = null!;
     //[PluginService] public static IObjectTable ObjectTable { get; private set; } = null!;
     //[PluginService] public static IGameGui GameGui { get; private set; } = null!;
+
+    public static void LogPosition(string name, Vector2? position)
+    {
+        if (position != null)
+        {
+            Log.Debug("Position for {0}: {1},{2}", name, position.Value.X, position.Value.Y);
+        } else
+        {
+            Log.Debug($"Position for {name} was null.");
+        }
+    }
 }

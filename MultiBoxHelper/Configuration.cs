@@ -17,15 +17,16 @@ public class Configuration : IPluginConfiguration
 
     public bool BardMuteSound = false;
     public bool BardDisablePenumbra = false;
-    public bool BardLowGraphicsMode = false;
+    // could use a better middle ground for this
+    public bool BardLowGraphicsMode = true;
     public int BardObjectLimit = (int)DisplayObjectLimit.Normal;
 
-    public bool CloneMuteSound = false;
-    public bool CloneDisablePenumbra = false;
-    public bool CloneLowGraphicsMode = false;
+    public bool CloneMuteSound = true;
+    public bool CloneDisablePenumbra = true;
+    public bool CloneLowGraphicsMode = true;
     public int CloneObjectLimit = (int)DisplayObjectLimit.Minimum;
 
-    public List<Character>? CloneCharacters { get; set; } = [];
+    public List<string> CloneCharacters { get; set; } = [];
 
     // the below exist just to make saving less cumbersome
     [NonSerialized]

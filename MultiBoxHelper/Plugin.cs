@@ -10,19 +10,25 @@ using Dalamud.Game.ClientState.Objects.SubKinds;
 using Dalamud.Game.Config;
 using System.ComponentModel;
 using MultiBoxHelper.Windows;
+using System.Linq;
 
 namespace MultiBoxHelper;
 
 public sealed class Plugin : IDalamudPlugin
 {
     private const string CommandName = "/mbh";
+    private const string BardModeCommand = "/bardmode";
+
+    private bool bardModeEnabled = false;
 
     public Configuration Configuration { get; init; }
 
     public readonly WindowSystem WindowSystem = new("MultiBoxHelper");
 
     private ConfigWindow ConfigWindow { get; init; }
-    private MainWindow MainWindow { get; init; }
+    public AddCloneWindow AddCloneWindow { get; init; }
+
+    //private MainWindow MainWindow { get; init; }
 
     public Plugin(
         [RequiredVersion("1.0")] DalamudPluginInterface pluginInterface)
@@ -33,20 +39,27 @@ public sealed class Plugin : IDalamudPlugin
         Configuration.Initialize(pluginInterface);
 
         // you might normally want to embed resources and load them from the manifest stream
-        var file = new FileInfo(Path.Combine(pluginInterface.AssemblyLocation.Directory?.FullName!, "goat.png"));
+        //var file = new FileInfo(Path.Combine(pluginInterface.AssemblyLocation.Directory?.FullName!, "goat.png"));
 
         // ITextureProvider takes care of the image caching and dispose
-        var goatImage = Service.TextureProvider.GetTextureFromFile(file);
+        //var goatImage = Service.TextureProvider.GetTextureFromFile(file);
 
         ConfigWindow = new ConfigWindow(this);
-        MainWindow = new MainWindow(this, goatImage);
+        AddCloneWindow = new AddCloneWindow(this);
+        //MainWindow = new MainWindow(this, goatImage);
 
         WindowSystem.AddWindow(ConfigWindow);
-        WindowSystem.AddWindow(MainWindow);
+        WindowSystem.AddWindow(AddCloneWindow);
+        //WindowSystem.AddWindow(MainWindow);
 
         Service.CommandManager.AddHandler(CommandName, new CommandInfo(OnCommand)
         {
-            HelpMessage = "A useful message to display in /xlhelp"
+            HelpMessage = "Display Multibox Helper configuration"
+        });
+
+        Service.CommandManager.AddHandler(BardModeCommand, new CommandInfo(OnBardCommand)
+        {
+            HelpMessage = "Toggle Bard Mode (lower settings to improve performance)"
         });
 
         pluginInterface.UiBuilder.Draw += DrawUI;
@@ -56,27 +69,33 @@ public sealed class Plugin : IDalamudPlugin
         pluginInterface.UiBuilder.OpenConfigUi += ToggleConfigUI;
 
         // Adds another button that is doing the same but for the main ui of the plugin
-        pluginInterface.UiBuilder.OpenMainUi += ToggleMainUI;
+        //pluginInterface.UiBuilder.OpenMainUi += ToggleMainUI;
 
         // Get notified for login and logout events
         Service.ClientState.Login += OnLogin;
-        Service.ClientState.Logout += OnLogout;
+        //Service.ClientState.Logout += OnLogout;
 
         // Checking to see some things about graphic settings.
-        Service.GameConfig.Changed += GameConfig_Changed;
+        //Service.GameConfig.Changed += GameConfig_Changed;
     }
 
-    private void GameConfig_Changed(object? sender, ConfigChangeEvent e)
+    private void OnBardCommand(string command, string arguments)
+    {
+        ToggleBardMode();
+    }
+
+
+    /*private void GameConfig_Changed(object? sender, ConfigChangeEvent e)
     {
         //Service.Log.Debug("Config change to: {0}", e.Option.ToString());
-    }
+    }*/
 
     public void Dispose()
     {
         WindowSystem.RemoveAllWindows();
 
         ConfigWindow.Dispose();
-        MainWindow.Dispose();
+        //MainWindow.Dispose();
 
         Service.CommandManager.RemoveHandler(CommandName);
     }
@@ -90,7 +109,7 @@ public sealed class Plugin : IDalamudPlugin
     private void DrawUI() => WindowSystem.Draw();
 
     public void ToggleConfigUI() => ConfigWindow.Toggle();
-    public void ToggleMainUI() => MainWindow.Toggle();
+    //public void ToggleMainUI() => MainWindow.Toggle();
 
     public void OnLogin()
     {
@@ -101,6 +120,15 @@ public sealed class Plugin : IDalamudPlugin
         {
             Service.Log.Debug("{0} @ {1} ({2})", pc.Name, pc.HomeWorld.GameData.Name, pc.NameId.ToString());
         }
+
+        if (isClone(pc))
+        {
+            SetCloneMode();
+        }
+        else
+        {
+            SetDefaultMode();
+        }
     }
 
     public void OnLogout()
@@ -108,19 +136,87 @@ public sealed class Plugin : IDalamudPlugin
         Service.Log.Debug("Logout event happpens.");
     }
 
-    private void RunSettingTest()
+    private void ToggleBardMode()
     {
-        // Turn down object limit
-        //GameConfig.Set(SystemConfigOption.DisplayObjectLimitType, (uint)DisplayObjectLimit.Minimum);
-
-        // Mute the sound
-        // GameConfig.Set(SystemConfigOption.IsSndMaster, false);
-
-        // Run the /btb gfxlow on command
-        // Also just run /penumbra disable
-
-
-        //CommandManager.ProcessCommand("/penumbra disable");
+        if (bardModeEnabled)
+        {
+            SetDefaultMode();
+        }
+        else
+        {
+            SetBardMode();
+        }
     }
 
+    private bool isClone(PlayerCharacter? pc)
+    {
+        if (pc != null && pc.HomeWorld != null && pc.HomeWorld.GameData != null)
+        {
+            var key = string.Format("{0}:{1}", pc.Name, pc.HomeWorld.GameData.Name);
+            if (Configuration.CloneCharacters != null && Configuration.CloneCharacters.Contains(key))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+
+    private void SetBardMode()
+    {
+        bardModeEnabled = true;
+
+        MuteSound(Configuration.BardMuteSound);
+        LowerGraphics(Configuration.BardLowGraphicsMode);
+        DisablePenumbra(Configuration.BardDisablePenumbra);
+        Service.GameConfig.Set(SystemConfigOption.DisplayObjectLimitType, (uint)Configuration.BardObjectLimit);
+    }
+
+    private void SetDefaultMode()
+    {
+        bardModeEnabled = false;
+
+        MuteSound(Configuration.DefaultMuteSound);
+        LowerGraphics(Configuration.DefaultLowGraphicsMode);
+        DisablePenumbra(Configuration.DefaultDisablePenumbra);
+        Service.GameConfig.Set(SystemConfigOption.DisplayObjectLimitType, (uint)Configuration.DefaultObjectLimit);
+    }
+
+    private void SetCloneMode()
+    {
+        MuteSound(Configuration.CloneMuteSound);
+        LowerGraphics(Configuration.CloneLowGraphicsMode);
+        DisablePenumbra(Configuration.CloneDisablePenumbra);
+        Service.GameConfig.Set(SystemConfigOption.DisplayObjectLimitType, (uint)Configuration.CloneObjectLimit);
+    }
+
+    private static void MuteSound(bool mute = true)
+    {
+        Service.GameConfig.Set(SystemConfigOption.IsSndMaster, !mute);
+    }
+
+    private static void DisablePenumbra(bool disable = true)
+    {
+        if (disable)
+        {
+            Service.CommandManager.ProcessCommand("/penumbra disable");
+        }
+        else
+        {
+            Service.CommandManager.ProcessCommand("/penumbra enable");
+        }
+    }
+
+    private static void LowerGraphics(bool lower = true)
+    {
+        if (lower)
+        {
+            Service.CommandManager.ProcessCommand("/btb gfxlow on");
+        }
+        else
+        {
+            Service.CommandManager.ProcessCommand("/btb gfxlow off");
+        }
+    }
 }

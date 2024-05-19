@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace MultiBoxHelper;
 
-public enum DisplayObjectLimit : uint
+public enum DisplayObjectLimit : int
 {
     Maximum = 0,
     High = 1,
