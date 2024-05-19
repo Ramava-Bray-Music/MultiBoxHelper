@@ -7,6 +7,7 @@ using Dalamud.Plugin.Services;
 using Dalamud.MultiBoxHelper.Windows;
 using System;
 using Dalamud.Logging;
+using Dalamud.Game.ClientState.Objects.SubKinds;
 
 namespace Dalamud.MultiBoxHelper;
 
@@ -111,7 +112,13 @@ public sealed class Plugin : IDalamudPlugin
 
     public void OnLogin()
     {
+        PlayerCharacter? pc = ClientState.LocalPlayer;
+
         Logger.Debug("Login event occurred.");
+        if (pc != null)
+        {
+            //Logger.Debug("{0} @ {1} ({2})", pc.Name, pc.HomeWorld.GameData.Name, pc.NameId.ToString());
+        }
     }
 
     public void OnLogout()
