@@ -3,10 +3,9 @@ using System.Numerics;
 using Dalamud.Interface.Internal;
 using Dalamud.Interface.Utility;
 using Dalamud.Interface.Windowing;
-using Dalamud.MultiBoxHelper;
 using ImGuiNET;
 
-namespace Dalamud.MultiBoxHelper.Windows;
+namespace MultiBoxHelper.Windows;
 
 public class MainWindow : Window, IDisposable
 {

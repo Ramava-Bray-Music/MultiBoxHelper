@@ -4,13 +4,14 @@ using Dalamud.Plugin;
 using System.IO;
 using Dalamud.Interface.Windowing;
 using Dalamud.Plugin.Services;
-using Dalamud.MultiBoxHelper.Windows;
 using System;
 using Dalamud.Logging;
 using Dalamud.Game.ClientState.Objects.SubKinds;
 using Dalamud.Game.Config;
+using System.ComponentModel;
+using MultiBoxHelper.Windows;
 
-namespace Dalamud.MultiBoxHelper;
+namespace MultiBoxHelper;
 
 public sealed class Plugin : IDalamudPlugin
 {
@@ -23,52 +24,19 @@ public sealed class Plugin : IDalamudPlugin
     private ConfigWindow ConfigWindow { get; init; }
     private MainWindow MainWindow { get; init; }
 
-    [PluginService]
-    private DalamudPluginInterface PluginInterface { get; init; }
-
-    [PluginService]
-    private ICommandManager CommandManager { get; init; }
-
-    private IClientState ClientState { get; init; }
-
-    private IPluginLog Logger { get; init; }
-
-    private IGameConfig GameConfig { get; init; }
-
-    /// <summary>
-    /// Gets the Dalamud client state.
-    /// </summary>
-    //[PluginService]
-    //private IClientState ClientState { get; set; } = null!;
-
-    /// <summary>
-    /// Gets the Dalamud command manager.
-    /// </summary>
-    //[PluginService]
-    //private IGameInteropProvider Interop { get; set; } = null!;
-
     public Plugin(
-        [RequiredVersion("1.0")] DalamudPluginInterface pluginInterface,
-        [RequiredVersion("1.0")] ICommandManager commandManager,
-        [RequiredVersion("1.0")] ITextureProvider textureProvider,
-        [RequiredVersion("1.0")] IClientState clientState,
-        [RequiredVersion("1.0")] IPluginLog pluginLog,
-        [RequiredVersion("1.0")] IGameConfig gameConfig)
+        [RequiredVersion("1.0")] DalamudPluginInterface pluginInterface)
     {
-        PluginInterface = pluginInterface;
-        CommandManager = commandManager;
-        ClientState = clientState;
-        Logger = pluginLog;
-        GameConfig = gameConfig;
+        pluginInterface.Create<Service>();
 
-        Configuration = PluginInterface.GetPluginConfig() as Configuration ?? new Configuration();
-        Configuration.Initialize(PluginInterface);
+        Configuration = pluginInterface.GetPluginConfig() as Configuration ?? new Configuration();
+        Configuration.Initialize(pluginInterface);
 
         // you might normally want to embed resources and load them from the manifest stream
-        var file = new FileInfo(Path.Combine(PluginInterface.AssemblyLocation.Directory?.FullName!, "goat.png"));
+        var file = new FileInfo(Path.Combine(pluginInterface.AssemblyLocation.Directory?.FullName!, "goat.png"));
 
         // ITextureProvider takes care of the image caching and dispose
-        var goatImage = textureProvider.GetTextureFromFile(file);
+        var goatImage = Service.TextureProvider.GetTextureFromFile(file);
 
         ConfigWindow = new ConfigWindow(this);
         MainWindow = new MainWindow(this, goatImage);
@@ -76,32 +44,31 @@ public sealed class Plugin : IDalamudPlugin
         WindowSystem.AddWindow(ConfigWindow);
         WindowSystem.AddWindow(MainWindow);
 
-        CommandManager.AddHandler(CommandName, new CommandInfo(OnCommand)
+        Service.CommandManager.AddHandler(CommandName, new CommandInfo(OnCommand)
         {
             HelpMessage = "A useful message to display in /xlhelp"
         });
 
-        PluginInterface.UiBuilder.Draw += DrawUI;
+        pluginInterface.UiBuilder.Draw += DrawUI;
 
         // This adds a button to the plugin installer entry of this plugin which allows
         // to toggle the display status of the configuration ui
-        PluginInterface.UiBuilder.OpenConfigUi += ToggleConfigUI;
+        pluginInterface.UiBuilder.OpenConfigUi += ToggleConfigUI;
 
         // Adds another button that is doing the same but for the main ui of the plugin
-        PluginInterface.UiBuilder.OpenMainUi += ToggleMainUI;
+        pluginInterface.UiBuilder.OpenMainUi += ToggleMainUI;
 
         // Get notified for login and logout events
-        ClientState.Login += OnLogin;
-        ClientState.Logout += OnLogout;
+        Service.ClientState.Login += OnLogin;
+        Service.ClientState.Logout += OnLogout;
 
         // Checking to see some things about graphic settings.
-        GameConfig.Changed += GameConfig_Changed;
+        Service.GameConfig.Changed += GameConfig_Changed;
     }
 
-    private void GameConfig_Changed(object? sender, Game.Config.ConfigChangeEvent e)
+    private void GameConfig_Changed(object? sender, ConfigChangeEvent e)
     {
-        //Logger.Debug("Config change to: {0}", e.Option.ToString());
-        
+        //Service.Log.Debug("Config change to: {0}", e.Option.ToString());
     }
 
     public void Dispose()
@@ -111,7 +78,7 @@ public sealed class Plugin : IDalamudPlugin
         ConfigWindow.Dispose();
         MainWindow.Dispose();
 
-        CommandManager.RemoveHandler(CommandName);
+        Service.CommandManager.RemoveHandler(CommandName);
     }
 
     private void OnCommand(string command, string args)
@@ -127,20 +94,33 @@ public sealed class Plugin : IDalamudPlugin
 
     public void OnLogin()
     {
-        PlayerCharacter? pc = ClientState.LocalPlayer;
+        var pc = Service.ClientState.LocalPlayer;
 
-        Logger.Debug("Login event occurred.");
-        if (pc != null)
+        Service.Log.Debug("Login event occurred.");
+        if (pc != null && pc.HomeWorld != null && pc.HomeWorld.GameData != null)
         {
-            Logger.Debug("{0} @ {1} ({2})", pc.Name, pc.HomeWorld.GameData.Name, pc.NameId.ToString());
+            Service.Log.Debug("{0} @ {1} ({2})", pc.Name, pc.HomeWorld.GameData.Name, pc.NameId.ToString());
         }
     }
 
     public void OnLogout()
     {
-        Logger.Debug("Logout event happpens.");
+        Service.Log.Debug("Logout event happpens.");
     }
 
-    
+    private void RunSettingTest()
+    {
+        // Turn down object limit
+        //GameConfig.Set(SystemConfigOption.DisplayObjectLimitType, (uint)DisplayObjectLimit.Minimum);
+
+        // Mute the sound
+        // GameConfig.Set(SystemConfigOption.IsSndMaster, false);
+
+        // Run the /btb gfxlow on command
+        // Also just run /penumbra disable
+
+
+        //CommandManager.ProcessCommand("/penumbra disable");
+    }
 
 }

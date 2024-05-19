@@ -2,7 +2,7 @@ using Dalamud.Configuration;
 using Dalamud.Plugin;
 using System;
 
-namespace Dalamud.MultiBoxHelper;
+namespace MultiBoxHelper;
 
 [Serializable]
 public class Configuration : IPluginConfiguration
@@ -14,15 +14,15 @@ public class Configuration : IPluginConfiguration
 
     // the below exist just to make saving less cumbersome
     [NonSerialized]
-    private DalamudPluginInterface? PluginInterface;
+    private DalamudPluginInterface? pluginInterface;
 
     public void Initialize(DalamudPluginInterface pluginInterface)
     {
-        PluginInterface = pluginInterface;
+        this.pluginInterface = pluginInterface;
     }
 
     public void Save()
     {
-        PluginInterface!.SavePluginConfig(this);
+        pluginInterface!.SavePluginConfig(this);
     }
 }
