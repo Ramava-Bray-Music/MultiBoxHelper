@@ -5,6 +5,8 @@ using System.IO;
 using Dalamud.Interface.Windowing;
 using Dalamud.Plugin.Services;
 using Dalamud.MultiBoxHelper.Windows;
+using System;
+using Dalamud.Logging;
 
 namespace Dalamud.MultiBoxHelper;
 
@@ -12,21 +14,46 @@ public sealed class Plugin : IDalamudPlugin
 {
     private const string CommandName = "/mbh";
 
-    private DalamudPluginInterface PluginInterface { get; init; }
-    private ICommandManager CommandManager { get; init; }
     public Configuration Configuration { get; init; }
 
     public readonly WindowSystem WindowSystem = new("MultiBoxHelper");
+
     private ConfigWindow ConfigWindow { get; init; }
     private MainWindow MainWindow { get; init; }
+
+    [PluginService]
+    private DalamudPluginInterface PluginInterface { get; init; }
+
+    [PluginService]
+    private ICommandManager CommandManager { get; init; }
+
+    private IClientState ClientState { get; init; }
+
+    private IPluginLog Logger { get; init; }
+
+    /// <summary>
+    /// Gets the Dalamud client state.
+    /// </summary>
+    //[PluginService]
+    //private IClientState ClientState { get; set; } = null!;
+
+    /// <summary>
+    /// Gets the Dalamud command manager.
+    /// </summary>
+    //[PluginService]
+    //private IGameInteropProvider Interop { get; set; } = null!;
 
     public Plugin(
         [RequiredVersion("1.0")] DalamudPluginInterface pluginInterface,
         [RequiredVersion("1.0")] ICommandManager commandManager,
-        [RequiredVersion("1.0")] ITextureProvider textureProvider)
+        [RequiredVersion("1.0")] ITextureProvider textureProvider,
+        [RequiredVersion("1.0")] IClientState clientState,
+        [RequiredVersion("1.0")] IPluginLog pluginLog)
     {
         PluginInterface = pluginInterface;
         CommandManager = commandManager;
+        ClientState = clientState;
+        Logger = pluginLog;
 
         Configuration = PluginInterface.GetPluginConfig() as Configuration ?? new Configuration();
         Configuration.Initialize(PluginInterface);
@@ -56,6 +83,9 @@ public sealed class Plugin : IDalamudPlugin
 
         // Adds another button that is doing the same but for the main ui of the plugin
         PluginInterface.UiBuilder.OpenMainUi += ToggleMainUI;
+
+        ClientState.Login += OnLogin;
+        ClientState.Logout += OnLogout;
     }
 
     public void Dispose()
@@ -78,4 +108,15 @@ public sealed class Plugin : IDalamudPlugin
 
     public void ToggleConfigUI() => ConfigWindow.Toggle();
     public void ToggleMainUI() => MainWindow.Toggle();
+
+    public void OnLogin()
+    {
+        Logger.Debug("Login event occurred.");
+    }
+
+    public void OnLogout()
+    {
+        Logger.Debug("Logout event happpens.");
+    }
+
 }
