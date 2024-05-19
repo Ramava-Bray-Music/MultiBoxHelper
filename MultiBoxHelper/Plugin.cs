@@ -8,6 +8,7 @@ using Dalamud.MultiBoxHelper.Windows;
 using System;
 using Dalamud.Logging;
 using Dalamud.Game.ClientState.Objects.SubKinds;
+using Dalamud.Game.Config;
 
 namespace Dalamud.MultiBoxHelper;
 
@@ -32,6 +33,8 @@ public sealed class Plugin : IDalamudPlugin
 
     private IPluginLog Logger { get; init; }
 
+    private IGameConfig GameConfig { get; init; }
+
     /// <summary>
     /// Gets the Dalamud client state.
     /// </summary>
@@ -49,12 +52,14 @@ public sealed class Plugin : IDalamudPlugin
         [RequiredVersion("1.0")] ICommandManager commandManager,
         [RequiredVersion("1.0")] ITextureProvider textureProvider,
         [RequiredVersion("1.0")] IClientState clientState,
-        [RequiredVersion("1.0")] IPluginLog pluginLog)
+        [RequiredVersion("1.0")] IPluginLog pluginLog,
+        [RequiredVersion("1.0")] IGameConfig gameConfig)
     {
         PluginInterface = pluginInterface;
         CommandManager = commandManager;
         ClientState = clientState;
         Logger = pluginLog;
+        GameConfig = gameConfig;
 
         Configuration = PluginInterface.GetPluginConfig() as Configuration ?? new Configuration();
         Configuration.Initialize(PluginInterface);
@@ -85,8 +90,18 @@ public sealed class Plugin : IDalamudPlugin
         // Adds another button that is doing the same but for the main ui of the plugin
         PluginInterface.UiBuilder.OpenMainUi += ToggleMainUI;
 
+        // Get notified for login and logout events
         ClientState.Login += OnLogin;
         ClientState.Logout += OnLogout;
+
+        // Checking to see some things about graphic settings.
+        GameConfig.Changed += GameConfig_Changed;
+    }
+
+    private void GameConfig_Changed(object? sender, Game.Config.ConfigChangeEvent e)
+    {
+        //Logger.Debug("Config change to: {0}", e.Option.ToString());
+        
     }
 
     public void Dispose()
@@ -117,7 +132,7 @@ public sealed class Plugin : IDalamudPlugin
         Logger.Debug("Login event occurred.");
         if (pc != null)
         {
-            //Logger.Debug("{0} @ {1} ({2})", pc.Name, pc.HomeWorld.GameData.Name, pc.NameId.ToString());
+            Logger.Debug("{0} @ {1} ({2})", pc.Name, pc.HomeWorld.GameData.Name, pc.NameId.ToString());
         }
     }
 
@@ -125,5 +140,7 @@ public sealed class Plugin : IDalamudPlugin
     {
         Logger.Debug("Logout event happpens.");
     }
+
+    
 
 }
