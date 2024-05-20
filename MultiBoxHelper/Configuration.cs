@@ -27,6 +27,7 @@ public class Configuration : IPluginConfiguration
     public int CloneObjectLimit = (int)DisplayObjectLimit.Minimum;
 
     public List<string> CloneCharacters { get; set; } = [];
+    public Dictionary<uint, List<string>> CloneList { get; set; } = [];
 
     // the below exist just to make saving less cumbersome
     [NonSerialized]

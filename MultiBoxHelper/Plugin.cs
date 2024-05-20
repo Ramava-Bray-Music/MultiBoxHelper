@@ -27,7 +27,6 @@ public sealed class Plugin : IDalamudPlugin
     public readonly WindowSystem WindowSystem = new("MultiBoxHelper");
 
     private ConfigWindow ConfigWindow { get; init; }
-    public AddCloneWindow AddCloneWindow { get; init; }
 
     //private MainWindow MainWindow { get; init; }
 
@@ -46,12 +45,8 @@ public sealed class Plugin : IDalamudPlugin
         //var goatImage = Service.TextureProvider.GetTextureFromFile(file);
 
         ConfigWindow = new ConfigWindow(this);
-        AddCloneWindow = new AddCloneWindow(this);
-        //MainWindow = new MainWindow(this, goatImage);
-
         WindowSystem.AddWindow(ConfigWindow);
-        WindowSystem.AddWindow(AddCloneWindow);
-        //WindowSystem.AddWindow(MainWindow);
+
 
         Service.CommandManager.AddHandler(CommandName, new CommandInfo(OnCommand)
         {
@@ -75,7 +70,7 @@ public sealed class Plugin : IDalamudPlugin
         pluginInterface.UiBuilder.OpenConfigUi += ToggleConfigUI;
 
         // Adds another button that is doing the same but for the main ui of the plugin
-        //pluginInterface.UiBuilder.OpenMainUi += ToggleMainUI;
+        pluginInterface.UiBuilder.OpenMainUi += ToggleConfigUI;
 
         // Get notified for login and logout events
         Service.ClientState.Login += OnLogin;
@@ -144,7 +139,7 @@ public sealed class Plugin : IDalamudPlugin
         }
     }
 
-    public void OnLogout()
+    public static void OnLogout()
     {
         Service.Log.Debug("Logout event happpens.");
     }
