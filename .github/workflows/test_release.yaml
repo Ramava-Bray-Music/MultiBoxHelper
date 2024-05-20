@@ -26,7 +26,7 @@ jobs:
       - name: write version into json
         run: |
           $ver = '${{ github.ref_name }}' -replace 'testing_'
-          $path = './MultiBoxHelper/bin/x64/Debug/MultiBoxHelper.json'
+          $path = './bin/x64/Debug/MultiBoxHelper.json'
           $json = Get-Content -Raw $path | ConvertFrom-Json
           $json.AssemblyVersion = $ver
           $content = $json | ConvertTo-Json
