@@ -24,8 +24,8 @@ public class ConfigWindow : Window, IDisposable
     //private string world = string.Empty;
     //private string clone = string.Empty;
 
-    private string selectedCharacter;
-    private uint selectedWorld;
+    private string selectedCharacter = string.Empty;
+    private uint selectedWorld = 0;
 
     // We give this window a constant ID using ###
     // This allows for labels being dynamic, like "{FPS Counter}fps###XYZ counter window",
@@ -38,7 +38,9 @@ public class ConfigWindow : Window, IDisposable
         this.plugin = plugin;
     }
 
-    public void Dispose() { }
+    public void Dispose()
+    {
+    }
 
 
     public override void PreDraw()
@@ -62,21 +64,6 @@ public class ConfigWindow : Window, IDisposable
             ImGui.EndChild();
 
             // Need to add some buttons below
-            // see: https://github.com/Caraxi/Honorific/blob/master/ConfigWindow.cs
-            /*
-            if (ImGuiComponents.IconButton(FontAwesomeIcon.Plus))
-            {
-                Service.Log.Debug($"Should be adding: {world}:{clone}");
-                plugin.Configuration.CloneCharacters.Add(string.Format($"{world}:{clone}"));
-                world = string.Empty;
-                clone = string.Empty;
-            }
-            if (ImGui.IsItemHovered())
-            {
-                ImGui.SetTooltip("Add a clone character");
-            }
-            ImGui.SameLine();
-            */
             if (ImGuiComponents.IconButton(FontAwesomeIcon.User))
             {
                 // Add current player character
@@ -107,7 +94,7 @@ public class ConfigWindow : Window, IDisposable
 
             if (ImGuiComponents.IconButton(FontAwesomeIcon.Trash))
             {
-                // Delete character from list
+                // TODO: Delete character from list
             }
             if (ImGui.IsItemHovered())
             {
@@ -189,29 +176,6 @@ public class ConfigWindow : Window, IDisposable
         }
 
         ImGui.EndGroup();
-
-        //ImGui.BeginGroup();
-        //ImGui.InputText("World Name", ref world, 45);
-        //ImGui.InputText("Character Name", ref clone, 45);
-        //ImGui.EndGroup();
-        /*
-
-        // can't ref a property, so use a local copy
-        var configValue = configuration.SomePropertyToBeSavedAndWithADefault;
-        if (ImGui.Checkbox("Random Config Bool", ref configValue))
-        {
-            configuration.SomePropertyToBeSavedAndWithADefault = configValue;
-            // can save immediately on change, if you don't want to provide a "Save and Close" button
-            configuration.Save();
-        }
-
-        var movable = configuration.IsConfigWindowMovable;
-        if (ImGui.Checkbox("Movable Config Window", ref movable))
-        {
-            configuration.IsConfigWindowMovable = movable;
-            configuration.Save();
-        }
-        */
     }
 
     private void DrawCharacterList()
@@ -219,7 +183,7 @@ public class ConfigWindow : Window, IDisposable
         ImGui.Text("Clone List");
         ImGui.PushItemWidth(225);
         ImGui.BeginListBox(string.Empty, new Vector2(225, 235));
-        //ImGui.ListBox("", ref selectedClone, plugin.Configuration.CloneCharacters.ToArray(), plugin.Configuration.CloneCharacters.Count, 11);
+        
         foreach (var (worldId, list) in plugin.Configuration.CloneList)
         {
             var world = Service.Data.GetExcelSheet<World>()?.GetRow(worldId);
@@ -230,7 +194,7 @@ public class ConfigWindow : Window, IDisposable
 
             foreach (var clone in list.ToArray())
             {
-                if (ImGui.Selectable($"{clone}##{world.Name.RawString}"))
+                if (ImGui.Selectable($"{clone}##{world.Name.RawString}", (selectedCharacter == clone && selectedWorld == worldId)))
                 {
                     selectedCharacter = clone;
                     selectedWorld = worldId;
@@ -251,11 +215,4 @@ public class ConfigWindow : Window, IDisposable
         ImGui.EndListBox();
 
     }
-    /*
-    public override void OnClose()
-    {
-        Service.PluginInterface.SavePluginConfig(plugin.Configuration);
-        base.OnClose();
-    }
-    */
 }

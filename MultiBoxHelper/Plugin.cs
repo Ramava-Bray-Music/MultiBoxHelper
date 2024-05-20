@@ -1,19 +1,16 @@
+using Dalamud.Game.ClientState.Objects.SubKinds;
 using Dalamud.Game.Command;
+using Dalamud.Game.Config;
+using Dalamud.Interface.Windowing;
 using Dalamud.IoC;
 using Dalamud.Plugin;
-using System.IO;
-using Dalamud.Interface.Windowing;
-using Dalamud.Plugin.Services;
-using System;
-using Dalamud.Logging;
-using Dalamud.Game.ClientState.Objects.SubKinds;
-using Dalamud.Game.Config;
-using System.ComponentModel;
 using MultiBoxHelper.Windows;
-using System.Linq;
 
 namespace MultiBoxHelper;
 
+/// <summary>
+/// Multibox Helper plugin
+/// </summary>
 public sealed class Plugin : IDalamudPlugin
 {
     private const string CommandName = "/mbh";
@@ -22,13 +19,17 @@ public sealed class Plugin : IDalamudPlugin
 
     private bool bardModeEnabled = false;
 
-    public Configuration Configuration { get; init; }
+    public Configuration Configuration
+    {
+        get; init;
+    }
 
     public readonly WindowSystem WindowSystem = new("MultiBoxHelper");
 
-    private ConfigWindow ConfigWindow { get; init; }
-
-    //private MainWindow MainWindow { get; init; }
+    private ConfigWindow ConfigWindow
+    {
+        get; init;
+    }
 
     public Plugin(
         [RequiredVersion("1.0")] DalamudPluginInterface pluginInterface)
@@ -70,63 +71,72 @@ public sealed class Plugin : IDalamudPlugin
         pluginInterface.UiBuilder.OpenConfigUi += ToggleConfigUI;
 
         // Adds another button that is doing the same but for the main ui of the plugin
-        pluginInterface.UiBuilder.OpenMainUi += ToggleConfigUI;
+        //pluginInterface.UiBuilder.OpenMainUi += ToggleConfigUI;
 
         // Get notified for login and logout events
         Service.ClientState.Login += OnLogin;
-        //Service.ClientState.Logout += OnLogout;
 
-        // Checking to see some things about graphic settings.
+        // For testing purposes at times
         //Service.GameConfig.Changed += GameConfig_Changed;
     }
 
-    private void OnCloneCommand(string command, string arguments)
-    {
-        // Just force it
-        Service.Log.Debug("Forcing Clone Mode!");
-        SetCloneMode();
-    }
-
-    private void OnBardCommand(string command, string arguments)
-    {
-        ToggleBardMode();
-    }
-
+#if DEBUG
+    /// <summary>
+    /// Create a log message to help us determine what setting actually changed for testing.
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
     private static void GameConfig_Changed(object? sender, ConfigChangeEvent e)
     {
         Service.Log.Debug("Config change to: {0}", e.Option.ToString());
     }
+#endif
 
     public void Dispose()
     {
         WindowSystem.RemoveAllWindows();
-
         ConfigWindow.Dispose();
-        //MainWindow.Dispose();
-
         Service.CommandManager.RemoveHandler(CommandName);
     }
 
+    /// <summary>
+    /// Handle /mbh
+    /// </summary>
+    /// <param name="command"></param>
+    /// <param name="args"></param>
     private void OnCommand(string command, string args)
     {
         // in response to the slash command, just toggle the display status of our configuration
         ToggleConfigUI();
     }
 
+    /// <summary>
+    /// Handle /bardmode
+    /// </summary>
+    /// <param name="command"></param>
+    /// <param name="arguments"></param>
+    private void OnBardCommand(string command, string arguments)
+    {
+        ToggleBardMode();
+    }
+
+    /// <summary>
+    /// Force clone mode on /clonemode
+    /// </summary>
+    /// <param name="command"></param>
+    /// <param name="arguments"></param>
+    private void OnCloneCommand(string command, string arguments)
+    {
+        SetCloneMode();
+    }
+
     private void DrawUI() => WindowSystem.Draw();
 
     public void ToggleConfigUI() => ConfigWindow.Toggle();
-    //public void ToggleMainUI() => MainWindow.Toggle();
 
     public void OnLogin()
     {
         var pc = Service.ClientState.LocalPlayer;
-
-        //Service.Log.Debug("Login event occurred.");
-        //if (pc != null && pc.HomeWorld != null && pc.HomeWorld.GameData != null)
-        //{
-            //Service.Log.Debug("{0} @ {1} ({2})", pc.Name, pc.HomeWorld.GameData.Name, pc.NameId.ToString());
-        //}
 
         if (isClone(pc))
         {
@@ -144,21 +154,9 @@ public sealed class Plugin : IDalamudPlugin
         Service.Log.Debug("Logout event happpens.");
     }
 
-    private void ToggleBardMode()
-    {
-        if (bardModeEnabled)
-        {
-            SetDefaultMode();
-        }
-        else
-        {
-            SetBardMode();
-        }
-    }
-
     private bool isClone(PlayerCharacter? pc)
     {
-        
+
         if (pc != null && pc.HomeWorld != null && pc.HomeWorld.GameData != null)
         {
             Service.Log.Debug($"Checking for {pc.Name.TextValue} @ {pc.HomeWorld.GameData.Name.RawString}...");
@@ -175,6 +173,18 @@ public sealed class Plugin : IDalamudPlugin
         return false;
     }
 
+
+    private void ToggleBardMode()
+    {
+        if (bardModeEnabled)
+        {
+            SetDefaultMode();
+        }
+        else
+        {
+            SetBardMode();
+        }
+    }
 
     private void SetBardMode()
     {
@@ -198,6 +208,9 @@ public sealed class Plugin : IDalamudPlugin
 
     private void SetCloneMode()
     {
+        // so we can just go to default mode from clone mode directly
+        bardModeEnabled = true;
+
         MuteSound(Configuration.CloneMuteSound);
         LowerGraphics(Configuration.CloneLowGraphicsMode);
         DisablePenumbra(Configuration.CloneDisablePenumbra);
@@ -206,11 +219,9 @@ public sealed class Plugin : IDalamudPlugin
 
     private static void MuteSound(bool mute = true)
     {
-        //Service.GameConfig.Set(SystemConfigOption.IsSoundDisable, mute);
         if (mute)
         {
             Service.Log.Debug("Attempting to mute");
-            //Service.GameConfig.Set(SystemConfigOption.IsSndMaster, false);
             Service.GameConfig.System.Set("SoundMaster", 0);
         }
         else

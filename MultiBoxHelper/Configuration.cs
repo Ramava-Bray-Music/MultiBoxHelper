@@ -1,35 +1,39 @@
 using Dalamud.Configuration;
 using Dalamud.Game.ClientState.Objects.SubKinds;
 using Dalamud.Plugin;
-using FFXIVClientStructs.FFXIV.Component.GUI;
-using Lumina.Excel.GeneratedSheets;
 using System;
 using System.Collections.Generic;
 
 namespace MultiBoxHelper;
 
+/// <summary>
+/// Configuration data for the plugin
+/// </summary>
 [Serializable]
 public class Configuration : IPluginConfiguration
 {
-    public int Version { get; set; } = 0;
+    // Update when this changes
+    public int Version { get; set; } = 2024052001;
 
+    // Default mode
     public bool DefaultMuteSound = false;
     public bool DefaultDisablePenumbra = false;
     public bool DefaultLowGraphicsMode = false;
     public int DefaultObjectLimit = (int)DisplayObjectLimit.Maximum;
 
+    // Bard Mode
     public bool BardMuteSound = false;
     public bool BardDisablePenumbra = false;
     // could use a better middle ground for this
     public bool BardLowGraphicsMode = true;
     public int BardObjectLimit = (int)DisplayObjectLimit.Normal;
 
+    // Clone mode
     public bool CloneMuteSound = true;
     public bool CloneDisablePenumbra = true;
     public bool CloneLowGraphicsMode = true;
     public int CloneObjectLimit = (int)DisplayObjectLimit.Minimum;
 
-    public List<string> CloneCharacters { get; set; } = [];
     public Dictionary<uint, List<string>> CloneList { get; set; } = [];
 
     // the below exist just to make saving less cumbersome
@@ -48,17 +52,18 @@ public class Configuration : IPluginConfiguration
 
     public void AddClone(PlayerCharacter character)
     {
-
-        // Should be providing feedback if any of this fails.
+        // TODO: Should be providing feedback if any of this fails.
         var world = character.HomeWorld.Id;
         var name = character.Name.TextValue;
 
-        if (!CloneList.ContainsKey(world))
+        // Need to make sure there's a sublist for that world first
+        if (!CloneList.TryGetValue(world, out var value))
         {
-            CloneList[world] = [];
+            value = ([]);
+            CloneList[world] = value;
         }
-        if (!CloneList[world].Contains(name)) {
-            CloneList[world].Add(name);
+        if (!value.Contains(name)) {
+            value.Add(name);
         }
     }
 
@@ -69,6 +74,7 @@ public class Configuration : IPluginConfiguration
 
         list.Remove(clone);
 
+        // Remove the sublist if it's empty
         if (list.Count == 0)
         {
             CloneList.Remove(world);
