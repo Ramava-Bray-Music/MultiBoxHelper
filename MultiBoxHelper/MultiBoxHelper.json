@@ -1,12 +1,11 @@
 {
   "Author": "Ramava Bray",
-  "Name": "MultiBox Helper",
-  "Punchline": "Because one character is never enough.",
-  "Description": "Extra tools for multiboxing. Type /mbh to bring up the window.",
+  "Name": "Multibox Helper",
+  "Punchline": "Because one Bard is never enough.",
+  "Description": "Extra tools for multiboxing as a Bard.",
   "ApplicableVersion": "any",
   "Tags": [
     "bard",
-    "plugin",
     "multibox"
   ]
 }
