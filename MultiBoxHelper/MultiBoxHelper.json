@@ -1,11 +1,24 @@
 {
-  "Author": "Ramava Bray",
-  "Name": "Multibox Helper",
-  "Punchline": "Because one Bard is never enough.",
-  "Description": "Extra tools for multiboxing as a Bard.",
-  "ApplicableVersion": "any",
-  "Tags": [
-    "bard",
-    "multibox"
-  ]
+    "Author": "Ramava Bray",
+    "Name": "Multibox Helper",
+    "Punchline": "Because one Bard is never enough.",
+    "Description": "Extra tools for multiboxing as a Bard.",
+    "Tags": [
+        "bard",
+        "multibox"
+    ],
+    "InternalName": "MultiBoxHelper",
+    "AssemblyVersion": "0.1.0.0",
+    "TestingAssemblyVersion": "0.1.0.0",
+    "RepoUrl": "https://github.com/Ramava-Bray-Music/MultiBoxHelper",
+    "ApplicableVersion": "any",
+    "DalamudApiLevel": 9,
+    "IsHide": "False",
+    "IsTestingExclusive": "False",
+    "DownloadCount": 1,
+    "LastUpdate": 1618608322,
+    "DownloadLinkInstall": "https://github.com/Ramava-Bray-Music/MultiBoxHelper/releases/download/0.1.0.0/MultiBoxHelper.zip",
+    "DownloadLinkUpdate": "https://github.com/Ramava-Bray-Music/MultiBoxHelper/releases/download/0.1.0.0/MultiBoxHelper.zip",
+    "DownloadLinkTesting": "https://github.com/Ramava-Bray-Music/MultiBoxHelper/releases/download/testing_0.1.0.0/MultiBoxHelper.zip",
+    "IconUrl": "https://raw.githubusercontent.com/Ramava-Bray-Music/MultiBoxHelper/master/images/icon.png"
 }
