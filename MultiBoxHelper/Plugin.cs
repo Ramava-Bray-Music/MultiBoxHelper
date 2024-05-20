@@ -97,7 +97,7 @@ public sealed class Plugin : IDalamudPlugin
         ToggleBardMode();
     }
 
-    private void GameConfig_Changed(object? sender, ConfigChangeEvent e)
+    private static void GameConfig_Changed(object? sender, ConfigChangeEvent e)
     {
         Service.Log.Debug("Config change to: {0}", e.Option.ToString());
     }
@@ -212,11 +212,11 @@ public sealed class Plugin : IDalamudPlugin
         {
             Service.Log.Debug("Attempting to mute");
             //Service.GameConfig.Set(SystemConfigOption.IsSndMaster, false);
-            Service.GameConfig.System.Set("IsSndMaster", 0);
+            Service.GameConfig.System.Set("SoundMaster", 0);
         }
         else
         {
-            Service.GameConfig.System.Set("IsSndMaster", 1);
+            Service.GameConfig.System.Set("SoundMaster", 100);
         }
     }
 
