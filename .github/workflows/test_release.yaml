@@ -34,7 +34,7 @@ jobs:
       - name: Archive
         run: Compress-Archive -Path MultiBoxHelper/bin/x64/Debug/* -DestinationPath MultiBoxHelper.zip
       - name: Upload a Build Artifact
-        uses: echapmanFromBunnings/upload-artifact@3.0
+        uses: echapmanFromBunnings/upload-artifact@3.0.0
         with:
           path: |
             ./MultiBoxHelper/bin/x64/Debug/*
