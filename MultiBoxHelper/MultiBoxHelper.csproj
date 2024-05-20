@@ -9,7 +9,8 @@
         <PackageLicenseExpression>AGPL-3.0-or-later</PackageLicenseExpression>
         <IsPackable>false</IsPackable>
         <RootNamespace>$(MSBuildProjectName.Replace(" ", "_"))</RootNamespace>
-        <TargetFramework>net8.0</TargetFramework>
+        <TargetFramework>net8.0-windows</TargetFramework>
+        
         <PackageReadmeFile>README.md</PackageReadmeFile>
         <RepositoryUrl>https://github.com/Ramava-Bray-Music/MultiBoxHelper</RepositoryUrl>
         <RepositoryType>git</RepositoryType>
