@@ -18,6 +18,12 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Documentation", "Documentat
 		README.md = README.md
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Workflows", "Workflows", "{EA079E67-9232-4288-B44B-7DCDC550CA7F}"
+	ProjectSection(SolutionItems) = preProject
+		.github\workflows\release.yml = .github\workflows\release.yml
+		.github\workflows\test_release.yaml = .github\workflows\test_release.yaml
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -35,6 +41,7 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{757829C6-9083-48A3-A451-DE13074A780A} = {E249817E-D061-4352-8622-98FEE837182F}
 		{998CFF77-7D17-428A-8686-7025DFF0A3B3} = {E249817E-D061-4352-8622-98FEE837182F}
+		{EA079E67-9232-4288-B44B-7DCDC550CA7F} = {E249817E-D061-4352-8622-98FEE837182F}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {B17E85B1-5F60-4440-9F9A-3DDE877E8CDF}
