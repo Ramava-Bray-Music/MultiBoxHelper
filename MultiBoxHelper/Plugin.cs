@@ -18,6 +18,7 @@ public sealed class Plugin : IDalamudPlugin
 {
     private const string CommandName = "/mbh";
     private const string BardModeCommand = "/bardmode";
+    private const string CloneModeCommand = "/clonemode";
 
     private bool bardModeEnabled = false;
 
@@ -62,6 +63,11 @@ public sealed class Plugin : IDalamudPlugin
             HelpMessage = "Toggle Bard Mode (lower settings to improve performance)"
         });
 
+        Service.CommandManager.AddHandler(CloneModeCommand, new CommandInfo(OnCloneCommand)
+        {
+            HelpMessage = "Force Clone mode to be on."
+        });
+
         pluginInterface.UiBuilder.Draw += DrawUI;
 
         // This adds a button to the plugin installer entry of this plugin which allows
@@ -79,16 +85,22 @@ public sealed class Plugin : IDalamudPlugin
         //Service.GameConfig.Changed += GameConfig_Changed;
     }
 
+    private void OnCloneCommand(string command, string arguments)
+    {
+        // Just force it
+        Service.Log.Debug("Forcing Clone Mode!");
+        SetCloneMode();
+    }
+
     private void OnBardCommand(string command, string arguments)
     {
         ToggleBardMode();
     }
 
-
-    /*private void GameConfig_Changed(object? sender, ConfigChangeEvent e)
+    private void GameConfig_Changed(object? sender, ConfigChangeEvent e)
     {
-        //Service.Log.Debug("Config change to: {0}", e.Option.ToString());
-    }*/
+        Service.Log.Debug("Config change to: {0}", e.Option.ToString());
+    }
 
     public void Dispose()
     {
@@ -123,6 +135,7 @@ public sealed class Plugin : IDalamudPlugin
 
         if (isClone(pc))
         {
+            Service.Log.Debug("Clone detected.");
             SetCloneMode();
         }
         else
@@ -152,7 +165,8 @@ public sealed class Plugin : IDalamudPlugin
     {
         if (pc != null && pc.HomeWorld != null && pc.HomeWorld.GameData != null)
         {
-            var key = string.Format("{0}:{1}", pc.Name, pc.HomeWorld.GameData.Name);
+            var key = string.Format("{0}:{1}", pc.HomeWorld.GameData.Name, pc.Name);
+            Service.Log.Debug($"Checking for {key}...");
             if (Configuration.CloneCharacters != null && Configuration.CloneCharacters.Contains(key))
             {
                 return true;
@@ -193,7 +207,17 @@ public sealed class Plugin : IDalamudPlugin
 
     private static void MuteSound(bool mute = true)
     {
-        Service.GameConfig.Set(SystemConfigOption.IsSndMaster, !mute);
+        //Service.GameConfig.Set(SystemConfigOption.IsSoundDisable, mute);
+        if (mute)
+        {
+            Service.Log.Debug("Attempting to mute");
+            //Service.GameConfig.Set(SystemConfigOption.IsSndMaster, false);
+            Service.GameConfig.System.Set("IsSndMaster", 0);
+        }
+        else
+        {
+            Service.GameConfig.System.Set("IsSndMaster", 1);
+        }
     }
 
     private static void DisablePenumbra(bool disable = true)

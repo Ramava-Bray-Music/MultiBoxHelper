@@ -1,3 +1,4 @@
+using Dalamud.Interface.Utility;
 using Dalamud.Interface.Windowing;
 using ImGuiNET;
 using System;
@@ -41,6 +42,7 @@ namespace MultiBoxHelper.Windows
 
         public override void Draw()
         {
+            
             //Service.LogPosition("add window", Position);
 
             // Always center this window when appearing

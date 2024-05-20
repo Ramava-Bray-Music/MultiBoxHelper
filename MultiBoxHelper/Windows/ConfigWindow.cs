@@ -1,9 +1,12 @@
 using System;
 using System.Numerics;
+using System.Runtime.InteropServices;
+using System.Xml.Linq;
 using Dalamud.Interface;
 using Dalamud.Interface.Components;
 using Dalamud.Interface.Utility;
 using Dalamud.Interface.Windowing;
+using FFXIVClientStructs.FFXIV.Client.Graphics.Scene;
 using ImGuiNET;
 
 namespace MultiBoxHelper.Windows;
@@ -14,12 +17,15 @@ public class ConfigWindow : Window, IDisposable
     private readonly Plugin plugin;
     private Vector2 iconButtonSize = new(16);
 
+    private string world = string.Empty;
+    private string clone = string.Empty;
+
     // We give this window a constant ID using ###
     // This allows for labels being dynamic, like "{FPS Counter}fps###XYZ counter window",
     // and the window ID will always be "###XYZ counter window" for ImGui
     public ConfigWindow(Plugin plugin) : base("Multibox Helper Configuration###MultiBoxHelperConfiguration")
     {
-        Flags = ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoCollapse;
+        Flags = ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.AlwaysAutoResize;
 
         //configuration = plugin.Configuration;
         this.plugin = plugin;
@@ -32,9 +38,8 @@ public class ConfigWindow : Window, IDisposable
     {
         SizeConstraints = new WindowSizeConstraints
         {
-            MinimumSize = new Vector2(600, 350),
-            MaximumSize = new Vector2(600, 350)
-            //            MaximumSize = ImGuiHelpers.MainViewport.Size * 1 / ImGuiHelpers.GlobalScale * 0.95f
+            MinimumSize = new Vector2(400, 300),
+            MaximumSize = new Vector2(800, 600)
         };
     }
 
@@ -43,7 +48,7 @@ public class ConfigWindow : Window, IDisposable
         // Character list
         ImGui.BeginGroup();
         {
-            if (ImGui.BeginChild("clone_list", ImGuiHelpers.ScaledVector2(240, 0) - iconButtonSize with { X = 0 }, true))
+            if (ImGui.BeginChild("clone_list", ImGuiHelpers.ScaledVector2(240, 300) - iconButtonSize with { X = 0 }, true))
             {
                 DrawCharacterList();
             }
@@ -54,14 +59,10 @@ public class ConfigWindow : Window, IDisposable
 
             if (ImGuiComponents.IconButton(FontAwesomeIcon.Plus))
             {
-                Service.Log.Debug("Opening add window");
-
-                //window.Position = Position;
-                //window.Position = new Vector2(x: Position.Value.X + (Size.Value.X / 2), y: Position.Value.Y + (Size.Value.Y / 2));
-
-                plugin.AddCloneWindow.Reset();
-                plugin.AddCloneWindow.IsOpen = true;
-                plugin.AddCloneWindow.BringToFront();
+                Service.Log.Debug($"Should be adding: {world}:{clone}");
+                plugin.Configuration.CloneCharacters.Add(string.Format($"{world}:{clone}"));
+                world = string.Empty;
+                clone = string.Empty;
             }
             if (ImGui.IsItemHovered())
             {
@@ -163,6 +164,11 @@ public class ConfigWindow : Window, IDisposable
         }
 
         ImGui.EndGroup();
+
+        ImGui.BeginGroup(); 
+        ImGui.InputText("World Name", ref world, 45);
+        ImGui.InputText("Character Name", ref clone, 45);
+        ImGui.EndGroup();
         /*
 
         // can't ref a property, so use a local copy
@@ -183,9 +189,12 @@ public class ConfigWindow : Window, IDisposable
         */
     }
 
+    private int selectedClone;
     private void DrawCharacterList()
     {
         ImGui.Text("Clone List");
+        ImGui.ListBox("", ref selectedClone, plugin.Configuration.CloneCharacters.ToArray(), plugin.Configuration.CloneCharacters.Count, 10);
+
     }
     /*
     public override void OnClose()
