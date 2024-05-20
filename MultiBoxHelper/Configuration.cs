@@ -1,5 +1,8 @@
 using Dalamud.Configuration;
+using Dalamud.Game.ClientState.Objects.SubKinds;
 using Dalamud.Plugin;
+using FFXIVClientStructs.FFXIV.Component.GUI;
+using Lumina.Excel.GeneratedSheets;
 using System;
 using System.Collections.Generic;
 
@@ -41,5 +44,34 @@ public class Configuration : IPluginConfiguration
     public void Save()
     {
         pluginInterface!.SavePluginConfig(this);
+    }
+
+    public void AddClone(PlayerCharacter character)
+    {
+
+        // Should be providing feedback if any of this fails.
+        var world = character.HomeWorld.Id;
+        var name = character.Name.TextValue;
+
+        if (!CloneList.ContainsKey(world))
+        {
+            CloneList[world] = [];
+        }
+        if (!CloneList[world].Contains(name)) {
+            CloneList[world].Add(name);
+        }
+    }
+
+    internal void RemoveClone(uint world, string clone)
+    {
+        var list = CloneList[world];
+        if (list == null) return;
+
+        list.Remove(clone);
+
+        if (list.Count == 0)
+        {
+            CloneList.Remove(world);
+        }
     }
 }

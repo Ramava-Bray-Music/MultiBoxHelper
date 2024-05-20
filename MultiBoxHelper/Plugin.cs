@@ -122,11 +122,11 @@ public sealed class Plugin : IDalamudPlugin
     {
         var pc = Service.ClientState.LocalPlayer;
 
-        Service.Log.Debug("Login event occurred.");
-        if (pc != null && pc.HomeWorld != null && pc.HomeWorld.GameData != null)
-        {
-            Service.Log.Debug("{0} @ {1} ({2})", pc.Name, pc.HomeWorld.GameData.Name, pc.NameId.ToString());
-        }
+        //Service.Log.Debug("Login event occurred.");
+        //if (pc != null && pc.HomeWorld != null && pc.HomeWorld.GameData != null)
+        //{
+            //Service.Log.Debug("{0} @ {1} ({2})", pc.Name, pc.HomeWorld.GameData.Name, pc.NameId.ToString());
+        //}
 
         if (isClone(pc))
         {
@@ -158,13 +158,17 @@ public sealed class Plugin : IDalamudPlugin
 
     private bool isClone(PlayerCharacter? pc)
     {
+        
         if (pc != null && pc.HomeWorld != null && pc.HomeWorld.GameData != null)
         {
-            var key = string.Format("{0}:{1}", pc.HomeWorld.GameData.Name, pc.Name);
-            Service.Log.Debug($"Checking for {key}...");
-            if (Configuration.CloneCharacters != null && Configuration.CloneCharacters.Contains(key))
+            Service.Log.Debug($"Checking for {pc.Name.TextValue} @ {pc.HomeWorld.GameData.Name.RawString}...");
+            if (Configuration.CloneList.TryGetValue(pc.HomeWorld.Id, out var value))
             {
-                return true;
+                Service.Log.Debug("Have world in list.");
+                if (value.Contains(pc.Name.TextValue))
+                {
+                    return true;
+                }
             }
         }
 

@@ -1,13 +1,17 @@
 using System;
+using System.Collections.Generic;
 using System.Numerics;
 using System.Runtime.InteropServices;
 using System.Xml.Linq;
+using Dalamud.Game.ClientState.Objects.SubKinds;
 using Dalamud.Interface;
 using Dalamud.Interface.Components;
 using Dalamud.Interface.Utility;
 using Dalamud.Interface.Windowing;
 using FFXIVClientStructs.FFXIV.Client.Graphics.Scene;
 using ImGuiNET;
+using Lumina.Excel.GeneratedSheets;
+using World = Lumina.Excel.GeneratedSheets.World;
 
 namespace MultiBoxHelper.Windows;
 
@@ -17,8 +21,11 @@ public class ConfigWindow : Window, IDisposable
     private readonly Plugin plugin;
     private Vector2 iconButtonSize = new(16);
 
-    private string world = string.Empty;
-    private string clone = string.Empty;
+    //private string world = string.Empty;
+    //private string clone = string.Empty;
+
+    private string selectedCharacter;
+    private uint selectedWorld;
 
     // We give this window a constant ID using ###
     // This allows for labels being dynamic, like "{FPS Counter}fps###XYZ counter window",
@@ -56,7 +63,7 @@ public class ConfigWindow : Window, IDisposable
 
             // Need to add some buttons below
             // see: https://github.com/Caraxi/Honorific/blob/master/ConfigWindow.cs
-
+            /*
             if (ImGuiComponents.IconButton(FontAwesomeIcon.Plus))
             {
                 Service.Log.Debug($"Should be adding: {world}:{clone}");
@@ -69,14 +76,32 @@ public class ConfigWindow : Window, IDisposable
                 ImGui.SetTooltip("Add a clone character");
             }
             ImGui.SameLine();
-
-            if (ImGuiComponents.IconButton(FontAwesomeIcon.PencilAlt))
+            */
+            if (ImGuiComponents.IconButton(FontAwesomeIcon.User))
             {
-                // Edit character name/world
+                // Add current player character
+                if (Service.ClientState != null && Service.ClientState.LocalPlayer != null)
+                {
+                    plugin.Configuration.AddClone(Service.ClientState.LocalPlayer);
+                }
             }
             if (ImGui.IsItemHovered())
             {
-                ImGui.SetTooltip("Edit character name or world");
+                ImGui.SetTooltip("Add current character");
+            }
+            ImGui.SameLine();
+
+            if (ImGuiComponents.IconButton(FontAwesomeIcon.DotCircle))
+            {
+                // add target character
+                if (Service.Targets.Target is PlayerCharacter pc)
+                {
+                    plugin.Configuration.AddClone(pc);
+                }
+            }
+            if (ImGui.IsItemHovered())
+            {
+                ImGui.SetTooltip("Add current target");
             }
             ImGui.SameLine();
 
@@ -165,10 +190,10 @@ public class ConfigWindow : Window, IDisposable
 
         ImGui.EndGroup();
 
-        ImGui.BeginGroup(); 
-        ImGui.InputText("World Name", ref world, 45);
-        ImGui.InputText("Character Name", ref clone, 45);
-        ImGui.EndGroup();
+        //ImGui.BeginGroup();
+        //ImGui.InputText("World Name", ref world, 45);
+        //ImGui.InputText("Character Name", ref clone, 45);
+        //ImGui.EndGroup();
         /*
 
         // can't ref a property, so use a local copy
@@ -189,11 +214,41 @@ public class ConfigWindow : Window, IDisposable
         */
     }
 
-    private int selectedClone;
     private void DrawCharacterList()
     {
         ImGui.Text("Clone List");
-        ImGui.ListBox("", ref selectedClone, plugin.Configuration.CloneCharacters.ToArray(), plugin.Configuration.CloneCharacters.Count, 10);
+        ImGui.PushItemWidth(225);
+        ImGui.BeginListBox(string.Empty, new Vector2(225, 235));
+        //ImGui.ListBox("", ref selectedClone, plugin.Configuration.CloneCharacters.ToArray(), plugin.Configuration.CloneCharacters.Count, 11);
+        foreach (var (worldId, list) in plugin.Configuration.CloneList)
+        {
+            var world = Service.Data.GetExcelSheet<World>()?.GetRow(worldId);
+            if (world == null) continue;
+
+            ImGui.TextDisabled(world.Name.RawString);
+            ImGui.Separator();
+
+            foreach (var clone in list.ToArray())
+            {
+                if (ImGui.Selectable($"{clone}##{world.Name.RawString}"))
+                {
+                    selectedCharacter = clone;
+                    selectedWorld = worldId;
+                }
+                
+                if (ImGui.BeginPopupContextItem())
+                {
+                    if (ImGui.Selectable($"Remove '{clone} @ {world.Name.RawString}'"))
+                    {
+                        plugin.Configuration.RemoveClone(worldId, clone);
+                        selectedCharacter = string.Empty;
+                        selectedWorld = 0;
+                    }
+                    ImGui.EndPopup();
+                }
+            }
+        }
+        ImGui.EndListBox();
 
     }
     /*
