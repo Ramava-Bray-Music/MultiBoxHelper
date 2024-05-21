@@ -5,6 +5,7 @@ using Dalamud.Interface.Components;
 using Dalamud.Interface.Utility;
 using Dalamud.Interface.Windowing;
 using ImGuiNET;
+using MultiBoxHelper.Settings;
 using System;
 using System.Numerics;
 using World = Lumina.Excel.GeneratedSheets.World;
@@ -18,6 +19,7 @@ public class ConfigWindow : Window, IDisposable
 {
     //private Configuration configuration;
     private readonly Plugin plugin;
+    private readonly Configuration config;
     private Vector2 iconButtonSize = new(16);
 
     // selected entry in clone list
@@ -31,8 +33,9 @@ public class ConfigWindow : Window, IDisposable
     {
         Flags = ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.AlwaysAutoResize;
 
-        //configuration = plugin.Configuration;
+        //configuration = config;
         this.plugin = plugin;
+        this.config = plugin.Configuration;
     }
 
     public void Dispose()
@@ -109,29 +112,42 @@ public class ConfigWindow : Window, IDisposable
             if (ImGui.BeginTabItem("Default"))
             {
                 ImGui.Text("Default settings for when it's not specified otherwise.");
-                ImGui.Checkbox("Mute all sound###DefaultMuteSound", ref plugin.Configuration.DefaultMuteSound);
-                ImGui.Checkbox("Disable Penumbra###DefaultDisablePenumbra", ref plugin.Configuration.DefaultDisablePenumbra);
-                ImGui.Checkbox("Use low graphics mode###efaultLowGraphicsMode", ref plugin.Configuration.DefaultLowGraphicsMode);
+                ImGui.Checkbox("Mute all sound###DefaultMuteSound", ref config[Mode.Default].MuteSound);
+                ImGui.Checkbox("Disable Penumbra###DefaultDisablePenumbra", ref config[Mode.Default].DisablePenumbra);
+                ImGui.Checkbox("Use low graphics mode###DefaultLowGraphicsMode", ref config[Mode.Default].LowGraphicsMode);
 
                 ImGui.NewLine();
                 ImGui.Text("Visible character limit:");
                 ImGui.PushItemWidth(300);
-                ImGui.Combo("###DefaultObjectLimit", ref plugin.Configuration.DefaultObjectLimit, "Maximum\0High\0Normal\0Low\0Minimum\0\0");
+                ImGui.Combo("###DefaultObjectLimit", ref config[Mode.Default].ObjectLimit, "Maximum\0High\0Normal\0Low\0Minimum\0\0");
 
+                ImGui.NewLine();
+                ImGui.Text("FPS limit:");
+                ImGui.PushItemWidth(300);
+                ImGui.Combo("###DefaultFps", ref config[Mode.Default].Fps, "None\0Full refresh rate\01/2 of refresh rate\01/4 of refresh rate\0\0");
+                ImGui.Checkbox("Reduce FPS while window is inactive###DefaultFpsDownInactive", ref config[Mode.Default].FpsDownInactive);
+                ImGui.Checkbox("Reduce FPS while AFK###DefaultFpsDownAfk", ref config[Mode.Default].FpsDownAFK);
 
                 ImGui.EndTabItem();
             }
             if (ImGui.BeginTabItem("Bard Mode"))
             {
                 ImGui.Text("Settings for when Bard Mode is toggled.");
-                ImGui.Checkbox("Mute all sound###BardMuteSound", ref plugin.Configuration.BardMuteSound);
-                ImGui.Checkbox("Disable Penumbra###BardDisablePenumbra", ref plugin.Configuration.BardDisablePenumbra);
-                ImGui.Checkbox("Use low graphics mode###efaultLowGraphicsMode", ref plugin.Configuration.BardLowGraphicsMode);
+                ImGui.Checkbox("Mute all sound###BardMuteSound", ref config[Mode.Bard].MuteSound);
+                ImGui.Checkbox("Disable Penumbra###BardDisablePenumbra", ref config[Mode.Bard].DisablePenumbra);
+                ImGui.Checkbox("Use low graphics mode###efaultLowGraphicsMode", ref config[Mode.Bard].LowGraphicsMode);
 
                 ImGui.NewLine();
                 ImGui.Text("Visible character limit:");
                 ImGui.PushItemWidth(300);
-                ImGui.Combo("###BardObjectLimit", ref plugin.Configuration.BardObjectLimit, "Maximum\0High\0Normal\0Low\0Minimum\0\0");
+                ImGui.Combo("###BardObjectLimit", ref config[Mode.Bard].ObjectLimit, "Maximum\0High\0Normal\0Low\0Minimum\0\0");
+
+                ImGui.NewLine();
+                ImGui.Text("FPS limit:");
+                ImGui.PushItemWidth(300);
+                ImGui.Combo("###BardFps", ref config[Mode.Bard].Fps, "None\0Full refresh rate\01/2 of refresh rate\01/4 of refresh rate\0\0");
+                ImGui.Checkbox("Reduce FPS while window is inactive###BardFpsDownInactive", ref config[Mode.Bard].FpsDownInactive);
+                ImGui.Checkbox("Reduce FPS while AFK###BardFpsDownAfk", ref config[Mode.Bard].FpsDownAFK);
 
                 ImGui.EndTabItem();
             }
@@ -139,14 +155,21 @@ public class ConfigWindow : Window, IDisposable
             if (ImGui.BeginTabItem("Clone Settings"))
             {
                 ImGui.Text("Settings for all clones.");
-                ImGui.Checkbox("Mute all sound###CloneMuteSound", ref plugin.Configuration.CloneMuteSound);
-                ImGui.Checkbox("Disable Penumbra###CloneDisablePenumbra", ref plugin.Configuration.CloneDisablePenumbra);
-                ImGui.Checkbox("Use low graphics mode###efaultLowGraphicsMode", ref plugin.Configuration.CloneLowGraphicsMode);
+                ImGui.Checkbox("Mute all sound###CloneMuteSound", ref config[Mode.Clone].MuteSound);
+                ImGui.Checkbox("Disable Penumbra###CloneDisablePenumbra", ref config[Mode.Clone].DisablePenumbra);
+                ImGui.Checkbox("Use low graphics mode###efaultLowGraphicsMode", ref config[Mode.Clone].LowGraphicsMode);
 
                 ImGui.NewLine();
                 ImGui.Text("Visible character limit:");
                 ImGui.PushItemWidth(300);
-                ImGui.Combo("###CloneObjectLimit", ref plugin.Configuration.CloneObjectLimit, "Maximum\0High\0Normal\0Low\0Minimum\0\0");
+                ImGui.Combo("###CloneObjectLimit", ref config[Mode.Clone].ObjectLimit, "Maximum\0High\0Normal\0Low\0Minimum\0\0");
+
+                ImGui.NewLine();
+                ImGui.Text("FPS limit:");
+                ImGui.PushItemWidth(300);
+                ImGui.Combo("###CloneFps", ref config[Mode.Clone].Fps, "None\0Full refresh rate\01/2 of refresh rate\01/4 of refresh rate\0\0");
+                ImGui.Checkbox("Reduce FPS while window is inactive###CloneFpsDownInactive", ref config[Mode.Clone].FpsDownInactive);
+                ImGui.Checkbox("Reduce FPS while AFK###CloneFpsDownAfk", ref config[Mode.Clone].FpsDownAFK);
 
                 ImGui.EndTabItem();
             }
@@ -160,7 +183,7 @@ public class ConfigWindow : Window, IDisposable
         ImGui.SameLine(200);
         if (ImGuiComponents.IconButtonWithText(FontAwesomeIcon.Save, "Save Changes"))
         {
-            plugin.Configuration.Save();
+            config.Save();
             IsOpen = false;
         }
         if (ImGui.IsItemHovered())
@@ -177,7 +200,7 @@ public class ConfigWindow : Window, IDisposable
         ImGui.PushItemWidth(225);
         ImGui.BeginListBox(string.Empty, new Vector2(225, 235));
 
-        foreach (var (worldId, list) in plugin.Configuration.CloneList)
+        foreach (var (worldId, list) in config.CloneList)
         {
             var world = Service.Data.GetExcelSheet<World>()?.GetRow(worldId);
             if (world == null)
@@ -217,7 +240,7 @@ public class ConfigWindow : Window, IDisposable
     {
         if (plugin != null)
         {
-            plugin.Configuration.RemoveClone(worldId, clone);
+            config.RemoveClone(worldId, clone);
             selectedClone = string.Empty;
             selectedWorld = 0;
         }
@@ -231,7 +254,7 @@ public class ConfigWindow : Window, IDisposable
     {
         if (clone != null && clone is PlayerCharacter pc)
         {
-            plugin.Configuration.AddClone(pc);
+            config.AddClone(pc);
             selectedClone = pc.Name.TextValue;
             selectedWorld = pc.HomeWorld.Id;
         }

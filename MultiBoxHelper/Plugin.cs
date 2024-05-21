@@ -4,7 +4,9 @@ using Dalamud.Game.Config;
 using Dalamud.Interface.Windowing;
 using Dalamud.IoC;
 using Dalamud.Plugin;
+using MultiBoxHelper.Settings;
 using MultiBoxHelper.Windows;
+using System;
 
 namespace MultiBoxHelper;
 
@@ -17,7 +19,32 @@ public sealed class Plugin : IDalamudPlugin
     private const string BardModeCommand = "/bardmode";
     private const string CloneModeCommand = "/clonemode";
 
-    private bool bardModeEnabled = false;
+    private Mode currentMode = Mode.Default;
+    public Mode CurrentMode
+    {
+        get
+        {
+            return currentMode;
+        }
+        set
+        {
+            currentMode = value;
+            SettingsManager.SetMode(Configuration[currentMode]);
+        }
+    }
+
+    private void ToggleBardMode()
+    {
+        // Check for Default here because we want to count Clone as Bard for this function
+        if (CurrentMode != Mode.Default)
+        {
+            CurrentMode = Mode.Default;
+        }
+        else
+        {
+            CurrentMode = Mode.Bard;
+        }
+    }
 
     public Configuration Configuration
     {
@@ -39,15 +66,8 @@ public sealed class Plugin : IDalamudPlugin
         Configuration = pluginInterface.GetPluginConfig() as Configuration ?? new Configuration();
         Configuration.Initialize(pluginInterface);
 
-        // you might normally want to embed resources and load them from the manifest stream
-        //var file = new FileInfo(Path.Combine(pluginInterface.AssemblyLocation.Directory?.FullName!, "goat.png"));
-
-        // ITextureProvider takes care of the image caching and dispose
-        //var goatImage = Service.TextureProvider.GetTextureFromFile(file);
-
         ConfigWindow = new ConfigWindow(this);
         WindowSystem.AddWindow(ConfigWindow);
-
 
         Service.CommandManager.AddHandler(CommandName, new CommandInfo(OnCommand)
         {
@@ -61,8 +81,15 @@ public sealed class Plugin : IDalamudPlugin
 
         Service.CommandManager.AddHandler(CloneModeCommand, new CommandInfo(OnCloneCommand)
         {
-            HelpMessage = "Force Clone mode to be on."
+            HelpMessage = "Force Clone Mode to be on."
         });
+
+#if DEBUG
+        Service.CommandManager.AddHandler("/datadump", new CommandInfo(OnDataDump)
+        {
+            HelpMessage = "Dump diagnostic or testing data we're currently needing."
+        });
+#endif
 
         pluginInterface.UiBuilder.Draw += DrawUI;
 
@@ -127,8 +154,24 @@ public sealed class Plugin : IDalamudPlugin
     /// <param name="arguments"></param>
     private void OnCloneCommand(string command, string arguments)
     {
-        SetCloneMode();
+        CurrentMode = Mode.Clone;
     }
+
+#if DEBUG
+    private void OnDataDump(string command, string arguments)
+    {
+        if (arguments.Equals("fps"))
+        {
+            uint fpsLimit, fpsInActive, fpsDownAfk;
+
+            Service.GameConfig.TryGet(SystemConfigOption.Fps, out fpsLimit);
+            Service.GameConfig.TryGet(SystemConfigOption.FPSDownAFK, out fpsDownAfk);
+            Service.GameConfig.TryGet(SystemConfigOption.FPSInActive, out fpsInActive);
+
+            Service.Log.Debug($"[FPS] fps limit: {fpsLimit}, fps afk: {fpsDownAfk}, fps inactive: {fpsInActive}");
+        }
+    }
+#endif
 
     private void DrawUI() => WindowSystem.Draw();
 
@@ -141,11 +184,11 @@ public sealed class Plugin : IDalamudPlugin
         if (isClone(pc))
         {
             Service.Log.Debug("Clone detected.");
-            SetCloneMode();
+            CurrentMode = Mode.Clone;
         }
         else
         {
-            SetDefaultMode();
+            CurrentMode = Mode.Default;
         }
     }
 
@@ -156,7 +199,6 @@ public sealed class Plugin : IDalamudPlugin
 
     private bool isClone(PlayerCharacter? pc)
     {
-
         if (pc != null && pc.HomeWorld != null && pc.HomeWorld.GameData != null)
         {
             Service.Log.Debug($"Checking for {pc.Name.TextValue} @ {pc.HomeWorld.GameData.Name.RawString}...");
@@ -174,83 +216,9 @@ public sealed class Plugin : IDalamudPlugin
     }
 
 
-    private void ToggleBardMode()
-    {
-        if (bardModeEnabled)
-        {
-            SetDefaultMode();
-        }
-        else
-        {
-            SetBardMode();
-        }
-    }
 
-    private void SetBardMode()
-    {
-        bardModeEnabled = true;
 
-        MuteSound(Configuration.BardMuteSound);
-        LowerGraphics(Configuration.BardLowGraphicsMode);
-        DisablePenumbra(Configuration.BardDisablePenumbra);
-        Service.GameConfig.Set(SystemConfigOption.DisplayObjectLimitType, (uint)Configuration.BardObjectLimit);
-    }
 
-    private void SetDefaultMode()
-    {
-        bardModeEnabled = false;
 
-        MuteSound(Configuration.DefaultMuteSound);
-        LowerGraphics(Configuration.DefaultLowGraphicsMode);
-        DisablePenumbra(Configuration.DefaultDisablePenumbra);
-        Service.GameConfig.Set(SystemConfigOption.DisplayObjectLimitType, (uint)Configuration.DefaultObjectLimit);
-    }
 
-    private void SetCloneMode()
-    {
-        // so we can just go to default mode from clone mode directly
-        bardModeEnabled = true;
-
-        MuteSound(Configuration.CloneMuteSound);
-        LowerGraphics(Configuration.CloneLowGraphicsMode);
-        DisablePenumbra(Configuration.CloneDisablePenumbra);
-        Service.GameConfig.Set(SystemConfigOption.DisplayObjectLimitType, (uint)Configuration.CloneObjectLimit);
-    }
-
-    private static void MuteSound(bool mute = true)
-    {
-        if (mute)
-        {
-            Service.Log.Debug("Attempting to mute");
-            Service.GameConfig.System.Set("SoundMaster", 0);
-        }
-        else
-        {
-            Service.GameConfig.System.Set("SoundMaster", 100);
-        }
-    }
-
-    private static void DisablePenumbra(bool disable = true)
-    {
-        if (disable)
-        {
-            Service.CommandManager.ProcessCommand("/penumbra disable");
-        }
-        else
-        {
-            Service.CommandManager.ProcessCommand("/penumbra enable");
-        }
-    }
-
-    private static void LowerGraphics(bool lower = true)
-    {
-        if (lower)
-        {
-            Service.CommandManager.ProcessCommand("/btb gfxlow on");
-        }
-        else
-        {
-            Service.CommandManager.ProcessCommand("/btb gfxlow off");
-        }
-    }
 }

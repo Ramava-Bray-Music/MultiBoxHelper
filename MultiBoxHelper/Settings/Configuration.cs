@@ -3,8 +3,9 @@ using Dalamud.Game.ClientState.Objects.SubKinds;
 using Dalamud.Plugin;
 using System;
 using System.Collections.Generic;
+using System.Numerics;
 
-namespace MultiBoxHelper;
+namespace MultiBoxHelper.Settings;
 
 /// <summary>
 /// Configuration data for the plugin
@@ -13,27 +14,28 @@ namespace MultiBoxHelper;
 public class Configuration : IPluginConfiguration
 {
     // Update when this changes
-    public int Version { get; set; } = 2024052001;
+    public int Version { get; set; } = 2024052101;
 
-    // Default mode
-    public bool DefaultMuteSound = false;
-    public bool DefaultDisablePenumbra = false;
-    public bool DefaultLowGraphicsMode = false;
-    public int DefaultObjectLimit = (int)DisplayObjectLimit.Maximum;
+    public ModeConfig Default { get; set; } = new ModeConfig(Mode.Default);
+    public ModeConfig Bard { get; set; } = new ModeConfig(Mode.Bard);
+    public ModeConfig Clone { get; set; } = new ModeConfig(Mode.Clone);
 
-    // Bard Mode
-    public bool BardMuteSound = false;
-    public bool BardDisablePenumbra = false;
-    // could use a better middle ground for this
-    public bool BardLowGraphicsMode = true;
-    public int BardObjectLimit = (int)DisplayObjectLimit.Normal;
+    public ModeConfig this[Mode mode]
+    {
+        get
+        {
+            return mode switch
+            {
+                Mode.Clone => Clone,
+                Mode.Bard => Bard,
+                _ => Default
+            };
+        }
+    }
 
-    // Clone mode
-    public bool CloneMuteSound = true;
-    public bool CloneDisablePenumbra = true;
-    public bool CloneLowGraphicsMode = true;
-    public int CloneObjectLimit = (int)DisplayObjectLimit.Minimum;
-
+    /// <summary>
+    /// List of clone characters
+    /// </summary>
     public Dictionary<uint, List<string>> CloneList { get; set; } = [];
 
     // the below exist just to make saving less cumbersome
@@ -62,7 +64,8 @@ public class Configuration : IPluginConfiguration
             value = ([]);
             CloneList[world] = value;
         }
-        if (!value.Contains(name)) {
+        if (!value.Contains(name))
+        {
             value.Add(name);
         }
     }
@@ -70,7 +73,8 @@ public class Configuration : IPluginConfiguration
     internal void RemoveClone(uint world, string clone)
     {
         var list = CloneList[world];
-        if (list == null) return;
+        if (list == null)
+            return;
 
         list.Remove(clone);
 

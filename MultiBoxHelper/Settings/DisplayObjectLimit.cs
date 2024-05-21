@@ -1,4 +1,4 @@
-namespace MultiBoxHelper;
+namespace MultiBoxHelper.Settings;
 
 /// <summary>
 /// Limit for characters on screen
