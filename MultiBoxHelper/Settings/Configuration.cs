@@ -16,19 +16,24 @@ public class Configuration : IPluginConfiguration
     // Update when this changes
     public int Version { get; set; } = 2024052101;
 
-    public ModeConfig Default { get; set; } = new ModeConfig(Mode.Default);
-    public ModeConfig Bard { get; set; } = new ModeConfig(Mode.Bard);
-    public ModeConfig Clone { get; set; } = new ModeConfig(Mode.Clone);
+    public ModeConfiguration DefaultModeConfiguration { get; set; } = new ModeConfiguration(Mode.Default);
+    public ModeConfiguration BardModeConfiguration { get; set; } = new ModeConfiguration(Mode.Bard);
+    public ModeConfiguration CloneModeConfiguration { get; set; } = new ModeConfiguration(Mode.Clone);
 
-    public ModeConfig this[Mode mode]
+    /// <summary>
+    /// Override to allow access to mode configurations by index.
+    /// </summary>
+    /// <param name="mode">mode to access</param>
+    /// <returns>configuration for requested mode</returns>
+    public ModeConfiguration this[Mode mode]
     {
         get
         {
             return mode switch
             {
-                Mode.Clone => Clone,
-                Mode.Bard => Bard,
-                _ => Default
+                Mode.Clone => CloneModeConfiguration,
+                Mode.Bard => BardModeConfiguration,
+                _ => DefaultModeConfiguration
             };
         }
     }
@@ -36,7 +41,7 @@ public class Configuration : IPluginConfiguration
     /// <summary>
     /// List of clone characters
     /// </summary>
-    public Dictionary<uint, List<string>> CloneList { get; set; } = [];
+    public Dictionary<uint, List<string>> CloneCharacterList { get; set; } = [];
 
     // the below exist just to make saving less cumbersome
     [NonSerialized]
@@ -52,6 +57,10 @@ public class Configuration : IPluginConfiguration
         pluginInterface!.SavePluginConfig(this);
     }
 
+    /// <summary>
+    /// Add a clone character to the list based on a PlayerCharacter GameObject.
+    /// </summary>
+    /// <param name="character"></param>
     public void AddClone(PlayerCharacter character)
     {
         // TODO: Should be providing feedback if any of this fails.
@@ -59,10 +68,10 @@ public class Configuration : IPluginConfiguration
         var name = character.Name.TextValue;
 
         // Need to make sure there's a sublist for that world first
-        if (!CloneList.TryGetValue(world, out var value))
+        if (!CloneCharacterList.TryGetValue(world, out var value))
         {
             value = ([]);
-            CloneList[world] = value;
+            CloneCharacterList[world] = value;
         }
         if (!value.Contains(name))
         {
@@ -70,9 +79,14 @@ public class Configuration : IPluginConfiguration
         }
     }
 
-    internal void RemoveClone(uint world, string clone)
+    /// <summary>
+    /// Remove a clone from the list by name and world id.
+    /// </summary>
+    /// <param name="world">id of the world</param>
+    /// <param name="clone">name of the clone</param>
+    public void RemoveClone(uint world, string clone)
     {
-        var list = CloneList[world];
+        var list = CloneCharacterList[world];
         if (list == null)
             return;
 
@@ -81,7 +95,7 @@ public class Configuration : IPluginConfiguration
         // Remove the sublist if it's empty
         if (list.Count == 0)
         {
-            CloneList.Remove(world);
+            CloneCharacterList.Remove(world);
         }
     }
 }

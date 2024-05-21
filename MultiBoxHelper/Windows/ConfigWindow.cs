@@ -200,7 +200,7 @@ public class ConfigWindow : Window, IDisposable
         ImGui.PushItemWidth(225);
         ImGui.BeginListBox(string.Empty, new Vector2(225, 235));
 
-        foreach (var (worldId, list) in config.CloneList)
+        foreach (var (worldId, list) in config.CloneCharacterList)
         {
             var world = Service.Data.GetExcelSheet<World>()?.GetRow(worldId);
             if (world == null)

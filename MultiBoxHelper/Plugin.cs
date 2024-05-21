@@ -202,7 +202,7 @@ public sealed class Plugin : IDalamudPlugin
         if (pc != null && pc.HomeWorld != null && pc.HomeWorld.GameData != null)
         {
             Service.Log.Debug($"Checking for {pc.Name.TextValue} @ {pc.HomeWorld.GameData.Name.RawString}...");
-            if (Configuration.CloneList.TryGetValue(pc.HomeWorld.Id, out var value))
+            if (Configuration.CloneCharacterList.TryGetValue(pc.HomeWorld.Id, out var value))
             {
                 Service.Log.Debug("Have world in list.");
                 if (value.Contains(pc.Name.TextValue))

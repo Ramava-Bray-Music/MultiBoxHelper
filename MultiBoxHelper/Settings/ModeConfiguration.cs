@@ -11,7 +11,7 @@ namespace MultiBoxHelper.Settings;
 /// Configuration data for an individual mode
 /// </summary>
 [Serializable]
-public class ModeConfig
+public class ModeConfiguration
 {
     // Default mode
     public bool MuteSound = false;
@@ -20,11 +20,12 @@ public class ModeConfig
     public bool LowGraphicsMode = false;
     public int ObjectLimit = (int)DisplayObjectLimit.Maximum;
 
+    // FPS related settings
     public int Fps = (int)FpsLimit.RefreshRate;
     public bool FpsDownAFK = true;
     public bool FpsDownInactive = true;
 
-    public ModeConfig(Mode mode)
+    public ModeConfiguration(Mode mode)
     {
         SetDefaults(mode);
     }

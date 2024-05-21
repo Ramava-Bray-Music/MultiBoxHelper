@@ -10,7 +10,7 @@ public static class SettingsManager
     /// <summary>
     /// Master function to access all the helpers at once for current mode.
     /// </summary>
-    public static void SetMode(ModeConfig config)
+    public static void SetMode(ModeConfiguration config)
     {
         MuteSound(config.MuteSound);
         LowerGraphics(config.LowGraphicsMode);
@@ -23,7 +23,7 @@ public static class SettingsManager
     /// Adjust FPS settings
     /// </summary>
     /// <param name="config">configuration for current mode</param>
-    public static void SetFps(ModeConfig config)
+    public static void SetFps(ModeConfiguration config)
     {
         Service.GameConfig.Set(SystemConfigOption.Fps, config.Fps);
         Service.GameConfig.Set(SystemConfigOption.FPSInActive, config.FpsDownInactive);
