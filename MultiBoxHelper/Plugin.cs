@@ -108,12 +108,13 @@ public sealed class Plugin : IDalamudPlugin
 
         // Get notified for login and logout events
         Service.ClientState.Login += OnLogin;
-
+#if DEBUG
         // For testing purposes at times
         Service.GameConfig.Changed += GameConfig_Changed;
+#endif
     }
 
-    public void Dispose()
+        public void Dispose()
     {
         WindowSystem.RemoveAllWindows();
         ConfigWindow.Dispose();
