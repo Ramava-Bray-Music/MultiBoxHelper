@@ -6,6 +6,9 @@ MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MultiBoxHelper", "MultiBoxHelper\MultiBoxHelper.csproj", "{13C812E9-0D42-4B95-8646-40EEBF30636F}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{E249817E-D061-4352-8622-98FEE837182F}"
+	ProjectSection(SolutionItems) = preProject
+		repo.json = repo.json
+	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Data", "Data", "{757829C6-9083-48A3-A451-DE13074A780A}"
 	ProjectSection(SolutionItems) = preProject

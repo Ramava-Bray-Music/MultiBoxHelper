@@ -20,6 +20,8 @@ public class ConfigWindow : Window, IDisposable
     //private Configuration configuration;
     private readonly Plugin plugin;
     private readonly Configuration config;
+
+    // TODO: See if we really need this. Probably should fix our size code to work with it.
     private Vector2 iconButtonSize = new(16);
 
     // selected entry in clone list
