@@ -59,7 +59,7 @@ public class ConfigWindow : Window, IDisposable
         // Character list
         ImGui.BeginGroup();
         {
-            if (ImGui.BeginChild("clone_list", ImGuiHelpers.ScaledVector2(240, -35), true))
+            if (ImGui.BeginChild("clone_list", ImGuiHelpers.ScaledVector2(240, -30), true))
             {
                 DrawCharacterList();
             }
@@ -67,7 +67,8 @@ public class ConfigWindow : Window, IDisposable
 
             // Need to add some buttons below
             ImGui.Spacing();
-
+            ImGui.Spacing();
+            ImGui.SameLine(20);
             // Add current player character
             if (ImGuiComponents.IconButton(FontAwesomeIcon.User))
             {
@@ -110,12 +111,13 @@ public class ConfigWindow : Window, IDisposable
         ImGui.SameLine();
 
         ImGui.BeginGroup();
-        if (ImGui.BeginChild("tabs", ImGuiHelpers.ScaledVector2(350, -35) , false))
+        if (ImGui.BeginChild("tabs", ImGuiHelpers.ScaledVector2(350, -30) , false))
         {
             DrawTabs();
         }
         ImGui.EndChild();
 
+        ImGui.Spacing();
         ImGui.Spacing();
         ImGui.SameLine(200);
         if (ImGuiComponents.IconButtonWithText(FontAwesomeIcon.Save, "Save Changes"))
