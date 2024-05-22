@@ -2,6 +2,15 @@ name: Create Test Release
 
 on: workflow_dispatch
   
+permissions:
+  contents: write
+  deployments: write
+  id-token: write
+  issues: write
+  packages: write
+  repository-projects: write
+  statuses: write
+
 jobs:
   build:
     runs-on: windows-latest
