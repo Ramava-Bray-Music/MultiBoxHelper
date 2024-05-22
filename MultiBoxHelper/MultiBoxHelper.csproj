@@ -24,11 +24,15 @@
     <ItemGroup>
       <None Remove="Data\BardGraphicsSettings.json" />
       <None Remove="Data\MaximumGraphicsSettings.json" />
+      <None Remove="images\icon.png" />
     </ItemGroup>
 
     <ItemGroup>
       <EmbeddedResource Include="Data\BardGraphicsSettings.json" />
       <EmbeddedResource Include="Data\MaximumGraphicsSettings.json" />
+      <EmbeddedResource Include="images\icon.png">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </EmbeddedResource>
     </ItemGroup>
 
     <ItemGroup>
