@@ -157,9 +157,7 @@ public sealed class Plugin : IDalamudPlugin
 
 #if DEBUG
     public bool watchConfigChanges = false;
-    public string watchingFor = string.Empty;
-    public int watchingSettingsType = 0;
-    private Dictionary<int, Dictionary<string, uint>> graphicsValues = [];
+\
     /// <summary>
     /// Create a log message to help us determine what setting actually changed for testing.
     /// </summary>
@@ -169,34 +167,14 @@ public sealed class Plugin : IDalamudPlugin
     {
         if (watchConfigChanges)
         {
-            //Service.Log.Debug("Config change to: {0}", e.Option.ToString());
-            var code = e.Option.ToString();
-            Service.GameConfig.System.TryGet(code, out uint value);
-
-            if (!graphicsValues.ContainsKey(watchingSettingsType))
-            {
-                graphicsValues[watchingSettingsType] = [];
-            }
-
-            graphicsValues[watchingSettingsType][code] = value;
+            Service.Log.Debug("Config change to: {0}", e.Option.ToString());
         }
 
     }
 
     private void OnDataDump(string command, string arguments)
     {
-
-    }
-
-    public void DumpLog()
-    {
-        Service.Log.Debug("Graphics Settings Dump [Default]");
-        Service.Log.Debug(JsonConvert.SerializeObject(Configuration[Mode.Default].GraphicsSettings));
-        Service.Log.Debug("Graphics Settings Dump [Bard]");
-        Service.Log.Debug(JsonConvert.SerializeObject(Configuration[Mode.Bard].GraphicsSettings));
-        Service.Log.Debug("Graphics Settings Dump [Clone]");
-        Service.Log.Debug(JsonConvert.SerializeObject(Configuration[Mode.Clone].GraphicsSettings));
-        graphicsValues = [];
+        // Add data dump for whatever we're researching here.
     }
 #endif
 
@@ -210,7 +188,6 @@ public sealed class Plugin : IDalamudPlugin
 
         if (isClone(pc))
         {
-            Service.Log.Debug("Clone detected.");
             CurrentMode = Mode.Clone;
         }
         else
@@ -219,19 +196,14 @@ public sealed class Plugin : IDalamudPlugin
         }
     }
 
-    public static void OnLogout()
-    {
-        Service.Log.Debug("Logout event happpens.");
-    }
-
     private bool isClone(PlayerCharacter? pc)
     {
         if (pc != null && pc.HomeWorld != null && pc.HomeWorld.GameData != null)
         {
-            Service.Log.Debug($"Checking for {pc.Name.TextValue} @ {pc.HomeWorld.GameData.Name.RawString}...");
+            // Check for list for home world
             if (Configuration.CloneCharacterList.TryGetValue(pc.HomeWorld.Id, out var value))
             {
-                Service.Log.Debug("Have world in list.");
+                // check for specific character
                 if (value.Contains(pc.Name.TextValue))
                 {
                     return true;

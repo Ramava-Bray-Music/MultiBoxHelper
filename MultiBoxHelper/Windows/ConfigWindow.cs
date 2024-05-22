@@ -57,11 +57,9 @@ public class ConfigWindow : Window, IDisposable
         {
             foreach (var name in iconNames)
             {
-                Service.Log.Debug($"images/{name}.png");
                 // Load images for buttons
                 var file = new FileInfo(Path.Combine(config.pluginInterface.AssemblyLocation.Directory?.FullName!, $"images/{name}.png"));
 
-                Service.Log.Debug(file.FullName);
                 // ITextureProvider takes care of the image caching and dispose
                 images[name] = Service.Textures.GetTextureFromFile(file);
                 if (images[name] == null)
