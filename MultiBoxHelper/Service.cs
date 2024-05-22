@@ -21,5 +21,5 @@ public class Service
     [PluginService] public static IGameConfig GameConfig { get; private set; } = null!;
     [PluginService] public static IPluginLog Log { get; private set; } = null!;
     [PluginService] public static ITargetManager Targets { get; private set; } = null!;
-    [PluginService] public static ITextureProvider TextureProvider { get; private set; } = null!;
+    [PluginService] public static ITextureProvider Textures { get; private set; } = null!;
 }

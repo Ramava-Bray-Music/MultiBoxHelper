@@ -1,8 +1,8 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
   <Import Project="Dalamud.Plugin.Bootstrap.targets" />
   <PropertyGroup>
-    <Version>0.2.0.12</Version>
+    <Version>0.3.0.0</Version>
     <Description>Extra tools for multibox Barding.</Description>
     <PackageProjectUrl>https://github.com/Ramava-Bray-Music/MultiBoxHelper</PackageProjectUrl>
     <PackageLicenseExpression>AGPL-3.0-or-later</PackageLicenseExpression>
@@ -15,8 +15,8 @@
     <Title>Multibox Helper Plugin</Title>
     <Copyright>(c) 2024 Ramava Bray</Copyright>
     <PackageTags>plugin;multibox;bard</PackageTags>
-    <AssemblyVersion>0.2.0.12</AssemblyVersion>
-    <FileVersion>0.2.0.12</FileVersion>
+    <AssemblyVersion>0.3.0.0</AssemblyVersion>
+    <FileVersion>0.3.0.0</FileVersion>
     <ShouldCreateLogs>True</ShouldCreateLogs>
     <AdvancedSettingsExpanded>True</AdvancedSettingsExpanded>
     <UpdateAssemblyVersion>True</UpdateAssemblyVersion>
@@ -33,11 +33,17 @@
   <ItemGroup>
     <None Remove="Data\BardGraphicsSettings.json" />
     <None Remove="Data\MaximumGraphicsSettings.json" />
+    <None Remove="images\bard.png" />
+    <None Remove="images\clone.png" />
+    <None Remove="images\default.png" />
     <None Remove="images\icon.png" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Data\BardGraphicsSettings.json" />
     <EmbeddedResource Include="Data\MaximumGraphicsSettings.json" />
+    <EmbeddedResource Include="images\default.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
     <EmbeddedResource Include="images\icon.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
@@ -47,6 +53,14 @@
       <Pack>True</Pack>
       <PackagePath>\</PackagePath>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="images\bard.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="images\clone.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <None Update="MultiBoxHelper.json">

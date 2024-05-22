@@ -4,6 +4,7 @@ using Dalamud.Game.Config;
 using Dalamud.Interface.Windowing;
 using Dalamud.IoC;
 using Dalamud.Plugin;
+using Dalamud.Plugin.Services;
 using MultiBoxHelper.Settings;
 using MultiBoxHelper.Windows;
 using Newtonsoft.Json;
@@ -22,6 +23,8 @@ public sealed class Plugin : IDalamudPlugin
     private const string CommandName = "/mbh";
     private const string BardModeCommand = "/bardmode";
     private const string CloneModeCommand = "/clonemode";
+
+  
 
     private Mode currentMode = Mode.Default;
     public Mode CurrentMode

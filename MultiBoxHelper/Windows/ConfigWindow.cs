@@ -2,11 +2,14 @@ using Dalamud.Game.ClientState.Objects.SubKinds;
 using Dalamud.Game.ClientState.Objects.Types;
 using Dalamud.Interface;
 using Dalamud.Interface.Components;
+using Dalamud.Interface.Internal;
 using Dalamud.Interface.Utility;
 using Dalamud.Interface.Windowing;
 using ImGuiNET;
 using MultiBoxHelper.Settings;
 using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Numerics;
 using World = Lumina.Excel.GeneratedSheets.World;
 
@@ -28,6 +31,10 @@ public class ConfigWindow : Window, IDisposable
     private string selectedClone = string.Empty;
     private uint selectedWorld = 0;
 
+    private Dictionary<string, IDalamudTextureWrap?> images { get; set; } = [];
+
+    private readonly List<string> iconNames = [@"bard", @"default", @"clone"];
+
     // We give this window a constant ID using ###
     // This allows for labels being dynamic, like "{FPS Counter}fps###XYZ counter window",
     // and the window ID will always be "###XYZ counter window" for ImGui
@@ -39,12 +46,30 @@ public class ConfigWindow : Window, IDisposable
         this.plugin = plugin;
         this.config = plugin.Configuration;
 
-        this.Size = ImGuiHelpers.ScaledVector2(580, 480);
+        this.Size = ImGuiHelpers.ScaledVector2(580, 500);
         /*this.SizeConstraints = new WindowSizeConstraints()
         {
             MaximumSize = new Vector2(580, 600),
             MinimumSize = new Vector2(550, 500)
         };*/
+
+        if (config.pluginInterface != null)
+        {
+            foreach (var name in iconNames)
+            {
+                Service.Log.Debug($"images/{name}.png");
+                // Load images for buttons
+                var file = new FileInfo(Path.Combine(config.pluginInterface.AssemblyLocation.Directory?.FullName!, $"images/{name}.png"));
+
+                Service.Log.Debug(file.FullName);
+                // ITextureProvider takes care of the image caching and dispose
+                images[name] = Service.Textures.GetTextureFromFile(file);
+                if (images[name] == null)
+                {
+                    Service.Log.Debug($"Couldn't load image for {name}.");
+                }
+            }
+        }
     }
 
     public void Dispose()
@@ -113,9 +138,15 @@ public class ConfigWindow : Window, IDisposable
         ImGui.SameLine();
 
         ImGui.BeginGroup();
-        if (ImGui.BeginChild("tabs", ImGuiHelpers.ScaledVector2(350, -30) , false))
+        if (ImGui.BeginChild("tabs", ImGuiHelpers.ScaledVector2(350, -90), false))
         {
             DrawTabs();
+        }
+        ImGui.EndChild();
+
+        if (ImGui.BeginChild("modes", ImGuiHelpers.ScaledVector2(0, 60), false))
+        {
+            DrawModeButtons();
         }
         ImGui.EndChild();
 
@@ -149,6 +180,44 @@ public class ConfigWindow : Window, IDisposable
 #endif
     }
 
+    private void DrawModeButtons()
+    {
+        ModeButton(Mode.Default);
+        ImGui.SameLine();
+        ModeButton(Mode.Bard);
+        ImGui.SameLine();
+        ModeButton(Mode.Clone);
+    }
+
+    private void ModeButton(Mode mode)
+    {
+        var name = mode.ToString().ToLower();
+        var disabled = (plugin.CurrentMode == mode);
+        if (images[name] != null)
+        {
+            var size = new Vector2(images[name]!.Width, images[name]!.Height);
+            if (disabled)
+            {
+                ImGui.BeginDisabled();
+            }
+
+            if (ImGui.ImageButton(images[name]!.ImGuiHandle, size))
+            {
+                plugin.CurrentMode = mode;
+            }
+
+            if (ImGui.IsItemHovered())
+            {
+                ImGui.SetTooltip("Switch to Default mode");
+            }
+
+            if (disabled)
+            {
+                ImGui.EndDisabled();
+            }
+        }
+    }
+
     private void DrawTabs()
     {
 
@@ -156,7 +225,7 @@ public class ConfigWindow : Window, IDisposable
         ImGuiTabBarFlags tabBarFlags = ImGuiTabBarFlags.None;
         if (ImGui.BeginTabBar("SettingsTabBar", tabBarFlags))
         {
-            if (ImGui.BeginTabItem("Default"))
+            if (ImGui.BeginTabItem("default"))
             {
                 ImGui.TextWrapped("Default settings for when it's not specified otherwise.");
                 ImGui.Spacing();
