@@ -1,50 +1,57 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
-    <Import Project="Dalamud.Plugin.Bootstrap.targets" />
-
-    <PropertyGroup>
-        <Version>0.2.0</Version>
-        <Description>Extra tools for multibox Barding.</Description>
-        <PackageProjectUrl>https://github.com/Ramava-Bray-Music/MultiBoxHelper</PackageProjectUrl>
-        <PackageLicenseExpression>AGPL-3.0-or-later</PackageLicenseExpression>
-        <IsPackable>false</IsPackable>
-        <RootNamespace>$(MSBuildProjectName.Replace(" ", "_"))</RootNamespace>
-        <TargetFramework>net8.0-windows</TargetFramework>
-        
-        <PackageReadmeFile>README.md</PackageReadmeFile>
-        <RepositoryUrl>https://github.com/Ramava-Bray-Music/MultiBoxHelper</RepositoryUrl>
-        <RepositoryType>git</RepositoryType>
-        <Title>Multibox Helper Plugin</Title>
-        <Copyright>(c) 2024 Ramava Bray</Copyright>
-        <PackageTags>plugin;multibox;bard</PackageTags>
-        <AssemblyVersion>0.2.0.*</AssemblyVersion>
-        <FileVersion></FileVersion>
-    </PropertyGroup>
-
-    <ItemGroup>
-      <None Remove="Data\BardGraphicsSettings.json" />
-      <None Remove="Data\MaximumGraphicsSettings.json" />
-      <None Remove="images\icon.png" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <EmbeddedResource Include="Data\BardGraphicsSettings.json" />
-      <EmbeddedResource Include="Data\MaximumGraphicsSettings.json" />
-      <EmbeddedResource Include="images\icon.png">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </EmbeddedResource>
-    </ItemGroup>
-
-    <ItemGroup>
-      <None Include="..\README.md">
-        <Pack>True</Pack>
-        <PackagePath>\</PackagePath>
-      </None>
-    </ItemGroup>
-
-    <ItemGroup>
-      <None Update="MultiBoxHelper.json">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </None>
-    </ItemGroup>
+  <Import Project="Dalamud.Plugin.Bootstrap.targets" />
+  <PropertyGroup>
+    <Version>0.2.0.1</Version>
+    <Description>Extra tools for multibox Barding.</Description>
+    <PackageProjectUrl>https://github.com/Ramava-Bray-Music/MultiBoxHelper</PackageProjectUrl>
+    <PackageLicenseExpression>AGPL-3.0-or-later</PackageLicenseExpression>
+    <IsPackable>false</IsPackable>
+    <RootNamespace>$(MSBuildProjectName.Replace(" ", "_"))</RootNamespace>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <RepositoryUrl>https://github.com/Ramava-Bray-Music/MultiBoxHelper</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <Title>Multibox Helper Plugin</Title>
+    <Copyright>(c) 2024 Ramava Bray</Copyright>
+    <PackageTags>plugin;multibox;bard</PackageTags>
+    <AssemblyVersion>0.2.0.1.*</AssemblyVersion>
+    <FileVersion>
+    </FileVersion>
+    <ShouldCreateLogs>True</ShouldCreateLogs>
+    <AdvancedSettingsExpanded>True</AdvancedSettingsExpanded>
+    <UpdateAssemblyVersion>True</UpdateAssemblyVersion>
+    <UpdateAssemblyFileVersion>True</UpdateAssemblyFileVersion>
+    <UpdateAssemblyInfoVersion>False</UpdateAssemblyInfoVersion>
+    <UpdatePackageVersion>True</UpdatePackageVersion>
+    <AssemblyInfoVersionType>SettingsVersion</AssemblyInfoVersionType>
+    <InheritWinAppVersionFrom>None</InheritWinAppVersionFrom>
+    <PackageVersionSettings>AssemblyVersion.None.None</PackageVersionSettings>
+    <PrimaryVersionType>AssemblyVersionAttribute</PrimaryVersionType>
+    <AssemblyVersionSettings>IncrementOnDemand.IncrementOnDemandWithResetOnIncrease.IncrementOnDemandWithResetOnIncrease.IncrementOnDemandWithResetOnIncrease</AssemblyVersionSettings>
+    <AssemblyFileVersionSettings>IncrementOnDemandWithResetOnIncrease.IncrementOnDemandWithResetOnIncrease.IncrementOnDemandWithResetOnIncrease.IncrementOnDemandWithResetOnIncrease</AssemblyFileVersionSettings>
+  </PropertyGroup>
+  <ItemGroup>
+    <None Remove="Data\BardGraphicsSettings.json" />
+    <None Remove="Data\MaximumGraphicsSettings.json" />
+    <None Remove="images\icon.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Data\BardGraphicsSettings.json" />
+    <EmbeddedResource Include="Data\MaximumGraphicsSettings.json" />
+    <EmbeddedResource Include="images\icon.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\README.md">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Update="MultiBoxHelper.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
 </Project>
