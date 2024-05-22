@@ -55,7 +55,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           tag: ${{ github.ref }}
-          name: Multibox Helper ${{ github.ref }}
+          name: ${{ github.ref_name }}
           draft: false
           prerelease: false
           allowUpdates: true
@@ -72,7 +72,7 @@ jobs:
           #asset_name: MultiBoxHelper.zip
           #asset_content_type: application/zip
 
-          #$json[0].DownloadLinkTesting = $json.DownloadLinkTesting -replace '[^/]+/MultiBoxHelper.zip',"$verT/MultiBoxHelper.zip"
+          
       - name: Write out repo.json
         run: |
           $verT = '${{ github.ref_name }}'
@@ -80,8 +80,7 @@ jobs:
           $path = './repo.json'
           $json = Get-Content -Raw $path | ConvertFrom-Json
           $json[0].TestingAssemblyVersion = $ver          
-        
-          $json[0].DownloadLinkTesting = ${{ steps.upload-release-asset.outputs.upload_url }}
+          $json[0].DownloadLinkTesting = $json.DownloadLinkTesting -replace '[^/]+/MultiBoxHelper.zip',"$verT/MultiBoxHelper.zip"
           $content = $json | ConvertTo-Json -AsArray
           set-content -Path $path -Value $content
 
