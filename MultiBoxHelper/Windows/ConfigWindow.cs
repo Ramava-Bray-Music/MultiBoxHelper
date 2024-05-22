@@ -40,7 +40,7 @@ public class ConfigWindow : Window, IDisposable
 
     public void Dispose()
     {
-       
+
     }
 
     /// <summary>
@@ -114,7 +114,6 @@ public class ConfigWindow : Window, IDisposable
                 ImGui.Text("Default settings for when it's not specified otherwise.");
                 ImGui.Checkbox("Mute all sound###DefaultMuteSound", ref config[Mode.Default].MuteSound);
                 ImGui.Checkbox("Disable Penumbra###DefaultDisablePenumbra", ref config[Mode.Default].DisablePenumbra);
-                ImGui.Checkbox("Use low graphics mode###DefaultLowGraphicsMode", ref config[Mode.Default].LowGraphicsMode);
 
                 ImGui.NewLine();
                 ImGui.Text("Visible character limit:");
@@ -128,6 +127,20 @@ public class ConfigWindow : Window, IDisposable
                 ImGui.Checkbox("Reduce FPS while window is inactive###DefaultFpsDownInactive", ref config[Mode.Default].FpsDownInactive);
                 ImGui.Checkbox("Reduce FPS while AFK###DefaultFpsDownAfk", ref config[Mode.Default].FpsDownAFK);
 
+                ImGui.NewLine();
+                ImGui.Checkbox("Change graphics settings###DefaultChangeGraphicsMode", ref config[Mode.Default].ChangeGraphicsMode);
+                if (ImGui.Button("Save Current"))
+                {
+                    plugin.Configuration.SaveGraphicsSettings(Mode.Default);
+                }
+                ImGui.SameLine();
+                if (
+                ImGui.Button("Reset to [Maximum]"))
+                {
+                    plugin.Configuration.ResetGraphicsSettings(Mode.Default);
+                }
+
+
                 ImGui.EndTabItem();
             }
             if (ImGui.BeginTabItem("Bard Mode"))
@@ -135,7 +148,6 @@ public class ConfigWindow : Window, IDisposable
                 ImGui.Text("Settings for when Bard Mode is toggled.");
                 ImGui.Checkbox("Mute all sound###BardMuteSound", ref config[Mode.Bard].MuteSound);
                 ImGui.Checkbox("Disable Penumbra###BardDisablePenumbra", ref config[Mode.Bard].DisablePenumbra);
-                ImGui.Checkbox("Use low graphics mode###efaultLowGraphicsMode", ref config[Mode.Bard].LowGraphicsMode);
 
                 ImGui.NewLine();
                 ImGui.Text("Visible character limit:");
@@ -149,6 +161,19 @@ public class ConfigWindow : Window, IDisposable
                 ImGui.Checkbox("Reduce FPS while window is inactive###BardFpsDownInactive", ref config[Mode.Bard].FpsDownInactive);
                 ImGui.Checkbox("Reduce FPS while AFK###BardFpsDownAfk", ref config[Mode.Bard].FpsDownAFK);
 
+                ImGui.NewLine();
+                ImGui.Checkbox("Change graphics settings###BardChangeGraphicsMode", ref config[Mode.Bard].ChangeGraphicsMode);
+                if (ImGui.Button("Save Current"))
+                {
+                    plugin.Configuration.SaveGraphicsSettings(Mode.Bard);
+                }
+                ImGui.SameLine();
+                if (
+                ImGui.Button("Reset to [Maximum]"))
+                {
+                    plugin.Configuration.ResetGraphicsSettings(Mode.Bard);
+                }
+
                 ImGui.EndTabItem();
             }
 
@@ -157,7 +182,6 @@ public class ConfigWindow : Window, IDisposable
                 ImGui.Text("Settings for all clones.");
                 ImGui.Checkbox("Mute all sound###CloneMuteSound", ref config[Mode.Clone].MuteSound);
                 ImGui.Checkbox("Disable Penumbra###CloneDisablePenumbra", ref config[Mode.Clone].DisablePenumbra);
-                ImGui.Checkbox("Use low graphics mode###efaultLowGraphicsMode", ref config[Mode.Clone].LowGraphicsMode);
 
                 ImGui.NewLine();
                 ImGui.Text("Visible character limit:");
@@ -170,6 +194,19 @@ public class ConfigWindow : Window, IDisposable
                 ImGui.Combo("###CloneFps", ref config[Mode.Clone].Fps, "None\0Full refresh rate\01/2 of refresh rate\01/4 of refresh rate\0\0");
                 ImGui.Checkbox("Reduce FPS while window is inactive###CloneFpsDownInactive", ref config[Mode.Clone].FpsDownInactive);
                 ImGui.Checkbox("Reduce FPS while AFK###CloneFpsDownAfk", ref config[Mode.Clone].FpsDownAFK);
+
+                ImGui.NewLine();
+                ImGui.Checkbox("Change graphics settings###CloneChangeGraphicsMode", ref config[Mode.Clone].ChangeGraphicsMode);
+                if (ImGui.Button("Save Current"))
+                {
+                    plugin.Configuration.SaveGraphicsSettings(Mode.Clone);
+                }
+                ImGui.SameLine();
+                if (
+                ImGui.Button("Reset to [Maximum]"))
+                {
+                    plugin.Configuration.ResetGraphicsSettings(Mode.Clone);
+                }
 
                 ImGui.EndTabItem();
             }
@@ -192,6 +229,20 @@ public class ConfigWindow : Window, IDisposable
         }
 
         ImGui.EndGroup();
+#if DEBUG
+        //ImGui.BeginGroup();
+
+        //ImGui.Checkbox("Log changes", ref plugin.watchConfigChanges);
+        //ImGui.Combo("", ref plugin.watchingSettingsType, "Maximum\0High (Desktop)\0High (Laptop)\0Standard (Desktop)\0Standard (Laptop)\0\0");
+
+        //if (
+        //ImGui.Button("Dump Log"))
+        //{
+        //    plugin.DumpLog();
+        //}
+
+        //ImGui.EndGroup();
+#endif
     }
 
     private void DrawCharacterList()

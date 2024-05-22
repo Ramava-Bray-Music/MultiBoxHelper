@@ -14,7 +14,7 @@ namespace MultiBoxHelper.Settings;
 public class Configuration : IPluginConfiguration
 {
     // Update when this changes
-    public int Version { get; set; } = 2024052101;
+    public int Version { get; set; } = 2024052104;
 
     public ModeConfiguration DefaultModeConfiguration { get; set; } = new ModeConfiguration(Mode.Default);
     public ModeConfiguration BardModeConfiguration { get; set; } = new ModeConfiguration(Mode.Bard);
@@ -98,4 +98,21 @@ public class Configuration : IPluginConfiguration
             CloneCharacterList.Remove(world);
         }
     }
+
+    /// <summary>
+    /// Save the current graphics settings to the selected mode
+    /// </summary>
+    /// <param name="mode"></param>
+    public void SaveGraphicsSettings(Mode mode)
+    {
+        this[mode].SaveCurrentGraphicsSettings();
+    }
+
+    /// <summary>
+    /// Helper function for resetting graphics defaults
+    /// </summary>
+    /// <param name="mode"></param>
+    public void ResetGraphicsSettings(Mode mode) {
+        this[mode].GraphicsSettings = ModeConfiguration.GetGraphicsDefaults(mode);
+    } 
 }

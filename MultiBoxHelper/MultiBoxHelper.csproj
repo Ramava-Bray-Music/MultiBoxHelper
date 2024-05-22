@@ -20,6 +20,16 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <None Remove="Data\BardGraphicsSettings.json" />
+      <None Remove="Data\MaximumGraphicsSettings.json" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <EmbeddedResource Include="Data\BardGraphicsSettings.json" />
+      <EmbeddedResource Include="Data\MaximumGraphicsSettings.json" />
+    </ItemGroup>
+
+    <ItemGroup>
       <None Include="..\README.md">
         <Pack>True</Pack>
         <PackagePath>\</PackagePath>

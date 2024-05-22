@@ -13,7 +13,7 @@ public static class SettingsManager
     public static void SetMode(ModeConfiguration config)
     {
         MuteSound(config.MuteSound);
-        LowerGraphics(config.LowGraphicsMode);
+        SetGraphicsSettings(config);
         DisablePenumbra(config.DisablePenumbra);
         Service.GameConfig.Set(SystemConfigOption.DisplayObjectLimitType, (uint)config.ObjectLimit);
         SetFps(config);
@@ -25,7 +25,7 @@ public static class SettingsManager
     /// <param name="config">configuration for current mode</param>
     public static void SetFps(ModeConfiguration config)
     {
-        Service.GameConfig.Set(SystemConfigOption.Fps, config.Fps);
+        Service.GameConfig.Set(SystemConfigOption.Fps, (uint)config.Fps);
         Service.GameConfig.Set(SystemConfigOption.FPSInActive, config.FpsDownInactive);
         Service.GameConfig.Set(SystemConfigOption.FPSDownAFK, config.FpsDownAFK);
     }
@@ -68,15 +68,15 @@ public static class SettingsManager
     /// </summary>
     /// <param name="lower"></param>
     /// TODO: Major rewrite
-    public static void LowerGraphics(bool lower = true)
+    public static void SetGraphicsSettings(ModeConfiguration config)
     {
-        if (lower)
-        {
-            Service.CommandManager.ProcessCommand("/btb gfxlow on");
+        if (!config.ChangeGraphicsMode) {
+            return;
         }
-        else
+
+        foreach (var (setting, value) in config.GraphicsSettings)
         {
-            Service.CommandManager.ProcessCommand("/btb gfxlow off");
+            Service.GameConfig.System.Set(setting, value);
         }
     }
 }

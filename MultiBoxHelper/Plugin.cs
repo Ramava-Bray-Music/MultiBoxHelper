@@ -6,7 +6,11 @@ using Dalamud.IoC;
 using Dalamud.Plugin;
 using MultiBoxHelper.Settings;
 using MultiBoxHelper.Windows;
+using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Runtime.InteropServices.Marshalling;
 
 namespace MultiBoxHelper;
 
@@ -30,6 +34,8 @@ public sealed class Plugin : IDalamudPlugin
         {
             currentMode = value;
             SettingsManager.SetMode(Configuration[currentMode]);
+
+            Service.Log.Info($"Enabling {currentMode} mode");
         }
     }
 
@@ -104,20 +110,8 @@ public sealed class Plugin : IDalamudPlugin
         Service.ClientState.Login += OnLogin;
 
         // For testing purposes at times
-        //Service.GameConfig.Changed += GameConfig_Changed;
+        Service.GameConfig.Changed += GameConfig_Changed;
     }
-
-#if DEBUG
-    /// <summary>
-    /// Create a log message to help us determine what setting actually changed for testing.
-    /// </summary>
-    /// <param name="sender"></param>
-    /// <param name="e"></param>
-    private static void GameConfig_Changed(object? sender, ConfigChangeEvent e)
-    {
-        Service.Log.Debug("Config change to: {0}", e.Option.ToString());
-    }
-#endif
 
     public void Dispose()
     {
@@ -158,18 +152,47 @@ public sealed class Plugin : IDalamudPlugin
     }
 
 #if DEBUG
+    public bool watchConfigChanges = false;
+    public string watchingFor = string.Empty;
+    public int watchingSettingsType = 0;
+    private Dictionary<int, Dictionary<string, uint>> graphicsValues = [];
+    /// <summary>
+    /// Create a log message to help us determine what setting actually changed for testing.
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
+    private void GameConfig_Changed(object? sender, ConfigChangeEvent e)
+    {
+        if (watchConfigChanges)
+        {
+            //Service.Log.Debug("Config change to: {0}", e.Option.ToString());
+            var code = e.Option.ToString();
+            Service.GameConfig.System.TryGet(code, out uint value);
+
+            if (!graphicsValues.ContainsKey(watchingSettingsType))
+            {
+                graphicsValues[watchingSettingsType] = [];
+            }
+
+            graphicsValues[watchingSettingsType][code] = value;
+        }
+
+    }
+
     private void OnDataDump(string command, string arguments)
     {
-        if (arguments.Equals("fps"))
-        {
-            uint fpsLimit, fpsInActive, fpsDownAfk;
 
-            Service.GameConfig.TryGet(SystemConfigOption.Fps, out fpsLimit);
-            Service.GameConfig.TryGet(SystemConfigOption.FPSDownAFK, out fpsDownAfk);
-            Service.GameConfig.TryGet(SystemConfigOption.FPSInActive, out fpsInActive);
+    }
 
-            Service.Log.Debug($"[FPS] fps limit: {fpsLimit}, fps afk: {fpsDownAfk}, fps inactive: {fpsInActive}");
-        }
+    public void DumpLog()
+    {
+        Service.Log.Debug("Graphics Settings Dump [Default]");
+        Service.Log.Debug(JsonConvert.SerializeObject(Configuration[Mode.Default].GraphicsSettings));
+        Service.Log.Debug("Graphics Settings Dump [Bard]");
+        Service.Log.Debug(JsonConvert.SerializeObject(Configuration[Mode.Bard].GraphicsSettings));
+        Service.Log.Debug("Graphics Settings Dump [Clone]");
+        Service.Log.Debug(JsonConvert.SerializeObject(Configuration[Mode.Clone].GraphicsSettings));
+        graphicsValues = [];
     }
 #endif
 
