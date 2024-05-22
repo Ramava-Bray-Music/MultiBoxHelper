@@ -41,7 +41,7 @@ jobs:
             ./MultiBoxHelper/bin/x64/Debug/*
       - name: Create Release
         id: create_release
-        uses: ncipollo/release-action@v1
+        uses: actions/create-release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
