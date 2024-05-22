@@ -2,7 +2,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <Import Project="Dalamud.Plugin.Bootstrap.targets" />
   <PropertyGroup>
-    <Version>0.2.0.1</Version>
+    <Version>0.2.0.10</Version>
     <Description>Extra tools for multibox Barding.</Description>
     <PackageProjectUrl>https://github.com/Ramava-Bray-Music/MultiBoxHelper</PackageProjectUrl>
     <PackageLicenseExpression>AGPL-3.0-or-later</PackageLicenseExpression>
@@ -15,7 +15,7 @@
     <Title>Multibox Helper Plugin</Title>
     <Copyright>(c) 2024 Ramava Bray</Copyright>
     <PackageTags>plugin;multibox;bard</PackageTags>
-    <AssemblyVersion>0.2.0.1.*</AssemblyVersion>
+    <AssemblyVersion>0.2.0.10.*</AssemblyVersion>
     <FileVersion>
     </FileVersion>
     <ShouldCreateLogs>True</ShouldCreateLogs>
