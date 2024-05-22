@@ -169,7 +169,7 @@ public class ConfigWindow : Window, IDisposable
                 }
                 ImGui.SameLine();
                 if (
-                ImGui.Button("Reset to [Maximum]"))
+                ImGui.Button("Reset to [extra low]"))
                 {
                     plugin.Configuration.ResetGraphicsSettings(Mode.Bard);
                 }
@@ -203,7 +203,7 @@ public class ConfigWindow : Window, IDisposable
                 }
                 ImGui.SameLine();
                 if (
-                ImGui.Button("Reset to [Maximum]"))
+                ImGui.Button("Reset to [extra low]"))
                 {
                     plugin.Configuration.ResetGraphicsSettings(Mode.Clone);
                 }
