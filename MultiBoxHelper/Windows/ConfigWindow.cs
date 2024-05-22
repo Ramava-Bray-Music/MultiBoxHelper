@@ -36,6 +36,13 @@ public class ConfigWindow : Window, IDisposable
         //configuration = config;
         this.plugin = plugin;
         this.config = plugin.Configuration;
+
+        this.Size = ImGuiHelpers.ScaledVector2(580, 480);
+        /*this.SizeConstraints = new WindowSizeConstraints()
+        {
+            MaximumSize = new Vector2(580, 600),
+            MinimumSize = new Vector2(550, 500)
+        };*/
     }
 
     public void Dispose()
@@ -48,19 +55,18 @@ public class ConfigWindow : Window, IDisposable
     /// </summary>
     public override void Draw()
     {
+
         // Character list
         ImGui.BeginGroup();
         {
-            if (ImGui.BeginChild("clone_list", ImGuiHelpers.ScaledVector2(240, 300) - iconButtonSize with
-            {
-                X = 0
-            }, true))
+            if (ImGui.BeginChild("clone_list", ImGuiHelpers.ScaledVector2(240, -35), true))
             {
                 DrawCharacterList();
             }
             ImGui.EndChild();
 
             // Need to add some buttons below
+            ImGui.Spacing();
 
             // Add current player character
             if (ImGuiComponents.IconButton(FontAwesomeIcon.User))
@@ -97,7 +103,6 @@ public class ConfigWindow : Window, IDisposable
                 ImGui.SetTooltip("Delete clone from list");
             }
             iconButtonSize = ImGui.GetItemRectSize() + ImGui.GetStyle().ItemSpacing;
-
         }
         ImGui.EndGroup();
 
@@ -105,13 +110,52 @@ public class ConfigWindow : Window, IDisposable
         ImGui.SameLine();
 
         ImGui.BeginGroup();
+        if (ImGui.BeginChild("tabs", ImGuiHelpers.ScaledVector2(350, -35) , false))
+        {
+            DrawTabs();
+        }
+        ImGui.EndChild();
+
+        ImGui.Spacing();
+        ImGui.SameLine(200);
+        if (ImGuiComponents.IconButtonWithText(FontAwesomeIcon.Save, "Save Changes"))
+        {
+            config.Save();
+            IsOpen = false;
+        }
+        if (ImGui.IsItemHovered())
+        {
+            ImGui.SetTooltip("Save and Close");
+        }
+
+        ImGui.EndGroup();
+#if DEBUG
+        //ImGui.BeginGroup();
+
+        //ImGui.Checkbox("Log changes", ref plugin.watchConfigChanges);
+        //ImGui.Combo("", ref plugin.watchingSettingsType, "Maximum\0High (Desktop)\0High (Laptop)\0Standard (Desktop)\0Standard (Laptop)\0\0");
+
+        //if (
+        //ImGui.Button("Dump Log"))
+        //{
+        //    plugin.DumpLog();
+        //}
+
+        //ImGui.EndGroup();
+#endif
+    }
+
+    private void DrawTabs()
+    {
+
         // Show tabs for configuration options
         ImGuiTabBarFlags tabBarFlags = ImGuiTabBarFlags.None;
         if (ImGui.BeginTabBar("SettingsTabBar", tabBarFlags))
         {
             if (ImGui.BeginTabItem("Default"))
             {
-                ImGui.Text("Default settings for when it's not specified otherwise.");
+                ImGui.TextWrapped("Default settings for when it's not specified otherwise.");
+                ImGui.Spacing();
                 ImGui.Checkbox("Mute all sound###DefaultMuteSound", ref config[Mode.Default].MuteSound);
                 ImGui.Checkbox("Disable Penumbra###DefaultDisablePenumbra", ref config[Mode.Default].DisablePenumbra);
 
@@ -145,7 +189,9 @@ public class ConfigWindow : Window, IDisposable
             }
             if (ImGui.BeginTabItem("Bard Mode"))
             {
-                ImGui.Text("Settings for when Bard Mode is toggled.");
+                ImGui.TextWrapped("Settings for when Bard Mode is toggled.");
+                ImGui.Spacing();
+
                 ImGui.Checkbox("Mute all sound###BardMuteSound", ref config[Mode.Bard].MuteSound);
                 ImGui.Checkbox("Disable Penumbra###BardDisablePenumbra", ref config[Mode.Bard].DisablePenumbra);
 
@@ -179,7 +225,9 @@ public class ConfigWindow : Window, IDisposable
 
             if (ImGui.BeginTabItem("Clone Settings"))
             {
-                ImGui.Text("Settings for all clones.");
+                ImGui.TextWrapped("Settings for all clones.");
+                ImGui.Spacing();
+
                 ImGui.Checkbox("Mute all sound###CloneMuteSound", ref config[Mode.Clone].MuteSound);
                 ImGui.Checkbox("Disable Penumbra###CloneDisablePenumbra", ref config[Mode.Clone].DisablePenumbra);
 
@@ -213,43 +261,14 @@ public class ConfigWindow : Window, IDisposable
 
             ImGui.EndTabBar();
         }
-
-        ImGui.NewLine();
-        ImGui.NewLine();
-        ImGui.NewLine();
-        ImGui.SameLine(200);
-        if (ImGuiComponents.IconButtonWithText(FontAwesomeIcon.Save, "Save Changes"))
-        {
-            config.Save();
-            IsOpen = false;
-        }
-        if (ImGui.IsItemHovered())
-        {
-            ImGui.SetTooltip("Save and Close");
-        }
-
-        ImGui.EndGroup();
-#if DEBUG
-        //ImGui.BeginGroup();
-
-        //ImGui.Checkbox("Log changes", ref plugin.watchConfigChanges);
-        //ImGui.Combo("", ref plugin.watchingSettingsType, "Maximum\0High (Desktop)\0High (Laptop)\0Standard (Desktop)\0Standard (Laptop)\0\0");
-
-        //if (
-        //ImGui.Button("Dump Log"))
-        //{
-        //    plugin.DumpLog();
-        //}
-
-        //ImGui.EndGroup();
-#endif
     }
 
     private void DrawCharacterList()
     {
+        var space = ImGui.GetContentRegionAvail();
         ImGui.Text("Clone List");
-        ImGui.PushItemWidth(225);
-        ImGui.BeginListBox(string.Empty, new Vector2(225, 235));
+        ImGui.PushItemWidth(0);
+        ImGui.BeginListBox(string.Empty, new Vector2(space.X, space.Y - 20));
 
         foreach (var (worldId, list) in config.CloneCharacterList)
         {
