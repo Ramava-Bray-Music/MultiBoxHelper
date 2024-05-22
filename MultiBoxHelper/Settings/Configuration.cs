@@ -14,7 +14,7 @@ namespace MultiBoxHelper.Settings;
 public class Configuration : IPluginConfiguration
 {
     // Update when this changes
-    public int Version { get; set; } = 2024052104;
+    public int Version { get; set; } = 2024052105;
 
     public ModeConfiguration DefaultModeConfiguration { get; set; } = new ModeConfiguration(Mode.Default);
     public ModeConfiguration BardModeConfiguration { get; set; } = new ModeConfiguration(Mode.Bard);

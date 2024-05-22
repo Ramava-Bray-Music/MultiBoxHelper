@@ -21,7 +21,7 @@ public class ModeConfiguration
     public bool MuteSound = false;
 
     public bool DisablePenumbra = false;
-    public bool ChangeGraphicsMode = false;
+    public bool ChangeGraphicsMode = true;
     public int ObjectLimit = (int)DisplayObjectLimit.Maximum;
 
     public GraphicsConfiguration GraphicsSettings = [];
