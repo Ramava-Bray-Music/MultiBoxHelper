@@ -22,7 +22,6 @@ public class ConfigWindow : Window, IDisposable
 {
     //private Configuration configuration;
     private readonly Plugin plugin;
-    private readonly Configuration config;
 
     // TODO: See if we really need this. Probably should fix our size code to work with it.
     private Vector2 iconButtonSize = new(16);
@@ -44,7 +43,6 @@ public class ConfigWindow : Window, IDisposable
 
         //configuration = config;
         this.plugin = plugin;
-        this.config = plugin.Configuration;
 
         this.Size = ImGuiHelpers.ScaledVector2(580, 500);
         /*this.SizeConstraints = new WindowSizeConstraints()
@@ -53,12 +51,12 @@ public class ConfigWindow : Window, IDisposable
             MinimumSize = new Vector2(550, 500)
         };*/
 
-        if (config.pluginInterface != null)
+        if (Plugin.Configuration.pluginInterface != null)
         {
             foreach (var name in iconNames)
             {
                 // Load images for buttons
-                var file = new FileInfo(Path.Combine(config.pluginInterface.AssemblyLocation.Directory?.FullName!, $"images/{name}.png"));
+                var file = new FileInfo(Path.Combine(Plugin.Configuration.pluginInterface.AssemblyLocation.Directory?.FullName!, $"images/{name}.png"));
 
                 // ITextureProvider takes care of the image caching and dispose
                 images[name] = Service.Textures.GetTextureFromFile(file);
@@ -153,8 +151,8 @@ public class ConfigWindow : Window, IDisposable
         ImGui.SameLine(200);
         if (ImGuiComponents.IconButtonWithText(FontAwesomeIcon.Save, "Save Changes"))
         {
-            config.Save();
             IsOpen = false;
+            Plugin.Configuration.Save();
         }
         if (ImGui.IsItemHovered())
         {
@@ -227,32 +225,32 @@ public class ConfigWindow : Window, IDisposable
             {
                 ImGui.TextWrapped("Default settings for when it's not specified otherwise.");
                 ImGui.Spacing();
-                ImGui.Checkbox("Mute all sound###DefaultMuteSound", ref config[Mode.Default].MuteSound);
-                ImGui.Checkbox("Disable Penumbra###DefaultDisablePenumbra", ref config[Mode.Default].DisablePenumbra);
+                ImGui.Checkbox("Mute all sound###DefaultMuteSound", ref Plugin.Configuration[Mode.Default].MuteSound);
+                ImGui.Checkbox("Disable Penumbra###DefaultDisablePenumbra", ref Plugin.Configuration[Mode.Default].DisablePenumbra);
 
                 ImGui.NewLine();
                 ImGui.Text("Visible character limit:");
                 ImGui.PushItemWidth(300);
-                ImGui.Combo("###DefaultObjectLimit", ref config[Mode.Default].ObjectLimit, "Maximum\0High\0Normal\0Low\0Minimum\0\0");
+                ImGui.Combo("###DefaultObjectLimit", ref Plugin.Configuration[Mode.Default].ObjectLimit, "Maximum\0High\0Normal\0Low\0Minimum\0\0");
 
                 ImGui.NewLine();
                 ImGui.Text("FPS limit:");
                 ImGui.PushItemWidth(300);
-                ImGui.Combo("###DefaultFps", ref config[Mode.Default].Fps, "None\0Full refresh rate\01/2 of refresh rate\01/4 of refresh rate\0\0");
-                ImGui.Checkbox("Reduce FPS while window is inactive###DefaultFpsDownInactive", ref config[Mode.Default].FpsDownInactive);
-                ImGui.Checkbox("Reduce FPS while AFK###DefaultFpsDownAfk", ref config[Mode.Default].FpsDownAFK);
+                ImGui.Combo("###DefaultFps", ref Plugin.Configuration[Mode.Default].Fps, "None\0Full refresh rate\01/2 of refresh rate\01/4 of refresh rate\0\0");
+                ImGui.Checkbox("Reduce FPS while window is inactive###DefaultFpsDownInactive", ref Plugin.Configuration[Mode.Default].FpsDownInactive);
+                ImGui.Checkbox("Reduce FPS while AFK###DefaultFpsDownAfk", ref Plugin.Configuration[Mode.Default].FpsDownAFK);
 
                 ImGui.NewLine();
-                ImGui.Checkbox("Change graphics settings###DefaultChangeGraphicsMode", ref config[Mode.Default].ChangeGraphicsMode);
+                ImGui.Checkbox("Change graphics settings###DefaultChangeGraphicsMode", ref Plugin.Configuration[Mode.Default].ChangeGraphicsMode);
                 if (ImGui.Button("Save Current"))
                 {
-                    plugin.Configuration.SaveGraphicsSettings(Mode.Default);
+                    Plugin.Configuration.SaveGraphicsSettings(Mode.Default);
                 }
                 ImGui.SameLine();
                 if (
                 ImGui.Button("Reset to [Maximum]"))
                 {
-                    plugin.Configuration.ResetGraphicsSettings(Mode.Default);
+                    Plugin.Configuration.ResetGraphicsSettings(Mode.Default);
                 }
 
 
@@ -263,32 +261,32 @@ public class ConfigWindow : Window, IDisposable
                 ImGui.TextWrapped("Settings for when Bard Mode is toggled.");
                 ImGui.Spacing();
 
-                ImGui.Checkbox("Mute all sound###BardMuteSound", ref config[Mode.Bard].MuteSound);
-                ImGui.Checkbox("Disable Penumbra###BardDisablePenumbra", ref config[Mode.Bard].DisablePenumbra);
+                ImGui.Checkbox("Mute all sound###BardMuteSound", ref Plugin.Configuration[Mode.Bard].MuteSound);
+                ImGui.Checkbox("Disable Penumbra###BardDisablePenumbra", ref Plugin.Configuration[Mode.Bard].DisablePenumbra);
 
                 ImGui.NewLine();
                 ImGui.Text("Visible character limit:");
                 ImGui.PushItemWidth(300);
-                ImGui.Combo("###BardObjectLimit", ref config[Mode.Bard].ObjectLimit, "Maximum\0High\0Normal\0Low\0Minimum\0\0");
+                ImGui.Combo("###BardObjectLimit", ref Plugin.Configuration[Mode.Bard].ObjectLimit, "Maximum\0High\0Normal\0Low\0Minimum\0\0");
 
                 ImGui.NewLine();
                 ImGui.Text("FPS limit:");
                 ImGui.PushItemWidth(300);
-                ImGui.Combo("###BardFps", ref config[Mode.Bard].Fps, "None\0Full refresh rate\01/2 of refresh rate\01/4 of refresh rate\0\0");
-                ImGui.Checkbox("Reduce FPS while window is inactive###BardFpsDownInactive", ref config[Mode.Bard].FpsDownInactive);
-                ImGui.Checkbox("Reduce FPS while AFK###BardFpsDownAfk", ref config[Mode.Bard].FpsDownAFK);
+                ImGui.Combo("###BardFps", ref Plugin.Configuration[Mode.Bard].Fps, "None\0Full refresh rate\01/2 of refresh rate\01/4 of refresh rate\0\0");
+                ImGui.Checkbox("Reduce FPS while window is inactive###BardFpsDownInactive", ref Plugin.Configuration[Mode.Bard].FpsDownInactive);
+                ImGui.Checkbox("Reduce FPS while AFK###BardFpsDownAfk", ref Plugin.Configuration[Mode.Bard].FpsDownAFK);
 
                 ImGui.NewLine();
-                ImGui.Checkbox("Change graphics settings###BardChangeGraphicsMode", ref config[Mode.Bard].ChangeGraphicsMode);
+                ImGui.Checkbox("Change graphics settings###BardChangeGraphicsMode", ref Plugin.Configuration[Mode.Bard].ChangeGraphicsMode);
                 if (ImGui.Button("Save Current"))
                 {
-                    plugin.Configuration.SaveGraphicsSettings(Mode.Bard);
+                    Plugin.Configuration.SaveGraphicsSettings(Mode.Bard);
                 }
                 ImGui.SameLine();
                 if (
                 ImGui.Button("Reset to [extra low]"))
                 {
-                    plugin.Configuration.ResetGraphicsSettings(Mode.Bard);
+                    Plugin.Configuration.ResetGraphicsSettings(Mode.Bard);
                 }
 
                 ImGui.EndTabItem();
@@ -299,32 +297,32 @@ public class ConfigWindow : Window, IDisposable
                 ImGui.TextWrapped("Settings for all clones.");
                 ImGui.Spacing();
 
-                ImGui.Checkbox("Mute all sound###CloneMuteSound", ref config[Mode.Clone].MuteSound);
-                ImGui.Checkbox("Disable Penumbra###CloneDisablePenumbra", ref config[Mode.Clone].DisablePenumbra);
+                ImGui.Checkbox("Mute all sound###CloneMuteSound", ref Plugin.Configuration[Mode.Clone].MuteSound);
+                ImGui.Checkbox("Disable Penumbra###CloneDisablePenumbra", ref Plugin.Configuration[Mode.Clone].DisablePenumbra);
 
                 ImGui.NewLine();
                 ImGui.Text("Visible character limit:");
                 ImGui.PushItemWidth(300);
-                ImGui.Combo("###CloneObjectLimit", ref config[Mode.Clone].ObjectLimit, "Maximum\0High\0Normal\0Low\0Minimum\0\0");
+                ImGui.Combo("###CloneObjectLimit", ref Plugin.Configuration[Mode.Clone].ObjectLimit, "Maximum\0High\0Normal\0Low\0Minimum\0\0");
 
                 ImGui.NewLine();
                 ImGui.Text("FPS limit:");
                 ImGui.PushItemWidth(300);
-                ImGui.Combo("###CloneFps", ref config[Mode.Clone].Fps, "None\0Full refresh rate\01/2 of refresh rate\01/4 of refresh rate\0\0");
-                ImGui.Checkbox("Reduce FPS while window is inactive###CloneFpsDownInactive", ref config[Mode.Clone].FpsDownInactive);
-                ImGui.Checkbox("Reduce FPS while AFK###CloneFpsDownAfk", ref config[Mode.Clone].FpsDownAFK);
+                ImGui.Combo("###CloneFps", ref Plugin.Configuration[Mode.Clone].Fps, "None\0Full refresh rate\01/2 of refresh rate\01/4 of refresh rate\0\0");
+                ImGui.Checkbox("Reduce FPS while window is inactive###CloneFpsDownInactive", ref Plugin.Configuration[Mode.Clone].FpsDownInactive);
+                ImGui.Checkbox("Reduce FPS while AFK###CloneFpsDownAfk", ref Plugin.Configuration[Mode.Clone].FpsDownAFK);
 
                 ImGui.NewLine();
-                ImGui.Checkbox("Change graphics settings###CloneChangeGraphicsMode", ref config[Mode.Clone].ChangeGraphicsMode);
+                ImGui.Checkbox("Change graphics settings###CloneChangeGraphicsMode", ref Plugin.Configuration[Mode.Clone].ChangeGraphicsMode);
                 if (ImGui.Button("Save Current"))
                 {
-                    plugin.Configuration.SaveGraphicsSettings(Mode.Clone);
+                    Plugin.Configuration.SaveGraphicsSettings(Mode.Clone);
                 }
                 ImGui.SameLine();
                 if (
                 ImGui.Button("Reset to [extra low]"))
                 {
-                    plugin.Configuration.ResetGraphicsSettings(Mode.Clone);
+                    Plugin.Configuration.ResetGraphicsSettings(Mode.Clone);
                 }
 
                 ImGui.EndTabItem();
@@ -341,7 +339,7 @@ public class ConfigWindow : Window, IDisposable
         ImGui.PushItemWidth(0);
         ImGui.BeginListBox(string.Empty, new Vector2(space.X, space.Y - 20));
 
-        foreach (var (worldId, list) in config.CloneCharacterList)
+        foreach (var (worldId, list) in Plugin.Configuration.CloneCharacterList)
         {
             var world = Service.Data.GetExcelSheet<World>()?.GetRow(worldId);
             if (world == null)
@@ -381,7 +379,7 @@ public class ConfigWindow : Window, IDisposable
     {
         if (plugin != null)
         {
-            config.RemoveClone(worldId, clone);
+            Plugin.Configuration.RemoveClone(worldId, clone);
             selectedClone = string.Empty;
             selectedWorld = 0;
         }
@@ -395,7 +393,7 @@ public class ConfigWindow : Window, IDisposable
     {
         if (clone != null && clone is PlayerCharacter pc)
         {
-            config.AddClone(pc);
+            Plugin.Configuration.AddClone(pc);
             selectedClone = pc.Name.TextValue;
             selectedWorld = pc.HomeWorld.Id;
         }

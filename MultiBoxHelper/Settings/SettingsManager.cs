@@ -38,7 +38,6 @@ public static class SettingsManager
     {
         if (mute)
         {
-            Service.Log.Debug("Attempting to mute");
             Service.GameConfig.System.Set("SoundMaster", 0);
         }
         else
@@ -70,7 +69,8 @@ public static class SettingsManager
     /// TODO: Major rewrite
     public static void SetGraphicsSettings(ModeConfiguration config)
     {
-        if (!config.ChangeGraphicsMode) {
+        if (!config.ChangeGraphicsMode)
+        {
             return;
         }
 

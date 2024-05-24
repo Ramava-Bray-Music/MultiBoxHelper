@@ -1,6 +1,9 @@
 using Dalamud.Configuration;
 using Dalamud.Game.ClientState.Objects.SubKinds;
 using Dalamud.Plugin;
+using Dalamud.Plugin.Ipc;
+using Dalamud.Plugin.Ipc.Exceptions;
+using MultiBoxHelper.IPC;
 using System;
 using System.Collections.Generic;
 using System.Numerics;
@@ -13,6 +16,12 @@ namespace MultiBoxHelper.Settings;
 [Serializable]
 public class Configuration : IPluginConfiguration
 {
+    public const string ConfigurationChangedIPC = "MultiBoxHelper.ConfigurationChanged";
+
+    // Only parameter is current Version number to make sure one of the clients isn't using an old one.
+    private readonly ICallGateProvider<bool, int, string> configurationChangedEvent = Service.PluginInterface.GetIpcProvider<bool, int, string>(ConfigurationChangedIPC);
+    private readonly ICallGateSubscriber<bool, int, string> configurationChanged = Service.PluginInterface.GetIpcSubscriber<bool, int, string>(ConfigurationChangedIPC);
+
     // Update when this changes
     public int Version { get; set; } = 2024052105;
 
@@ -55,6 +64,15 @@ public class Configuration : IPluginConfiguration
     public void Save()
     {
         pluginInterface!.SavePluginConfig(this);
+        try
+        {
+            // TODO: Trigger event to sync
+            IPCHandles.SyncAllSettings();
+        }
+        catch (IpcNotReadyError)
+        {
+            Service.Log.Error("Unable to send configuration change event to other clients.");
+        }
     }
 
     /// <summary>
@@ -92,7 +110,7 @@ public class Configuration : IPluginConfiguration
 
         list.Remove(clone);
 
-        // Remove the sublist if it's empty
+        // Remove the world character list if it's empty
         if (list.Count == 0)
         {
             CloneCharacterList.Remove(world);
@@ -112,7 +130,9 @@ public class Configuration : IPluginConfiguration
     /// Helper function for resetting graphics defaults
     /// </summary>
     /// <param name="mode"></param>
-    public void ResetGraphicsSettings(Mode mode) {
+    public void ResetGraphicsSettings(Mode mode)
+    {
         this[mode].GraphicsSettings = ModeConfiguration.GetGraphicsDefaults(mode);
-    } 
+    }
+
 }

@@ -4,14 +4,10 @@ using Dalamud.Game.Config;
 using Dalamud.Interface.Windowing;
 using Dalamud.IoC;
 using Dalamud.Plugin;
-using Dalamud.Plugin.Services;
+using MultiBoxHelper.IPC;
 using MultiBoxHelper.Settings;
 using MultiBoxHelper.Windows;
-using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Runtime.InteropServices.Marshalling;
+using System.Diagnostics;
 
 namespace MultiBoxHelper;
 
@@ -24,9 +20,11 @@ public sealed class Plugin : IDalamudPlugin
     private const string BardModeCommand = "/bardmode";
     private const string CloneModeCommand = "/clonemode";
 
-  
-
     private Mode currentMode = Mode.Default;
+
+    // This is a good place for it, I think?
+    internal static MultiboxManager MultiboxManager { get; private set; } = new MultiboxManager();
+
     public Mode CurrentMode
     {
         get
@@ -37,6 +35,10 @@ public sealed class Plugin : IDalamudPlugin
         {
             currentMode = value;
             SettingsManager.SetMode(Configuration[currentMode]);
+
+            // Do we want both? Not sure which is better yet.
+            Service.ToastGui.ShowNormal($"Enabled {currentMode} mode.");
+            Service.ChatGui.PrintError($"Enabled {currentMode} mode.", "Multibox Helper");
 
             Service.Log.Info($"Enabling {currentMode} mode");
         }
@@ -55,10 +57,10 @@ public sealed class Plugin : IDalamudPlugin
         }
     }
 
-    public Configuration Configuration
+    public static Configuration Configuration
     {
-        get; init;
-    }
+        get; private set;
+    } = new Configuration();
 
     public readonly WindowSystem WindowSystem = new("MultiBoxHelper");
 
@@ -72,34 +74,39 @@ public sealed class Plugin : IDalamudPlugin
     {
         pluginInterface.Create<Service>();
 
-        Configuration = pluginInterface.GetPluginConfig() as Configuration ?? new Configuration();
+        var config = pluginInterface.GetPluginConfig();
+        if (config != null)
+        {
+            Configuration = (Configuration)config;
+        }
         Configuration.Initialize(pluginInterface);
 
         ConfigWindow = new ConfigWindow(this);
         WindowSystem.AddWindow(ConfigWindow);
 
-        Service.CommandManager.AddHandler(CommandName, new CommandInfo(OnCommand)
+        _ = Service.CommandManager.AddHandler(CommandName, new CommandInfo(OnCommand)
         {
             HelpMessage = "Display Multibox Helper configuration"
         });
 
-        Service.CommandManager.AddHandler(BardModeCommand, new CommandInfo(OnBardCommand)
+        _ = Service.CommandManager.AddHandler(BardModeCommand, new CommandInfo(OnBardCommand)
         {
             HelpMessage = "Toggle Bard Mode (lower settings to improve performance)"
         });
 
-        Service.CommandManager.AddHandler(CloneModeCommand, new CommandInfo(OnCloneCommand)
+        _ = Service.CommandManager.AddHandler(CloneModeCommand, new CommandInfo(OnCloneCommand)
         {
             HelpMessage = "Force Clone Mode to be on."
         });
 
 #if DEBUG
-        Service.CommandManager.AddHandler("/datadump", new CommandInfo(OnDataDump)
+        _ = Service.CommandManager.AddHandler("/datadump", new CommandInfo(OnDataDump)
         {
             HelpMessage = "Dump diagnostic or testing data we're currently needing."
-        });
-#endif
 
+        });
+
+#endif
         pluginInterface.UiBuilder.Draw += DrawUI;
 
         // This adds a button to the plugin installer entry of this plugin which allows
@@ -111,16 +118,21 @@ public sealed class Plugin : IDalamudPlugin
 
         // Get notified for login and logout events
         Service.ClientState.Login += OnLogin;
+
 #if DEBUG
         // For testing purposes at times
         Service.GameConfig.Changed += GameConfig_Changed;
 #endif
     }
 
-        public void Dispose()
+    public void Dispose()
     {
         WindowSystem.RemoveAllWindows();
         ConfigWindow.Dispose();
+        if (MultiboxManager != null)
+        {
+            MultiboxManager.Dispose();
+        }
         Service.CommandManager.RemoveHandler(CommandName);
     }
 
@@ -157,7 +169,7 @@ public sealed class Plugin : IDalamudPlugin
 
 #if DEBUG
     public bool watchConfigChanges = false;
-\
+
     /// <summary>
     /// Create a log message to help us determine what setting actually changed for testing.
     /// </summary>
@@ -186,7 +198,7 @@ public sealed class Plugin : IDalamudPlugin
     {
         var pc = Service.ClientState.LocalPlayer;
 
-        if (isClone(pc))
+        if (IsClone(pc))
         {
             CurrentMode = Mode.Clone;
         }
@@ -196,12 +208,12 @@ public sealed class Plugin : IDalamudPlugin
         }
     }
 
-    private bool isClone(PlayerCharacter? pc)
+    private static bool IsClone(PlayerCharacter? pc)
     {
         if (pc != null && pc.HomeWorld != null && pc.HomeWorld.GameData != null)
         {
             // Check for list for home world
-            if (Configuration.CloneCharacterList.TryGetValue(pc.HomeWorld.Id, out var value))
+            if (Configuration != null && Configuration.CloneCharacterList.TryGetValue(pc.HomeWorld.Id, out var value))
             {
                 // check for specific character
                 if (value.Contains(pc.Name.TextValue))
@@ -214,10 +226,9 @@ public sealed class Plugin : IDalamudPlugin
         return false;
     }
 
-
-
-
-
-
-
+    internal static void UpdateConfiguration(Configuration config)
+    {
+        Configuration = config;
+        // TODO: Check for things we might need to do when this changes.
+    }
 }

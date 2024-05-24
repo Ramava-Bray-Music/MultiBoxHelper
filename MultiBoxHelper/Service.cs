@@ -2,11 +2,10 @@ using Dalamud.Game.ClientState.Objects;
 using Dalamud.IoC;
 using Dalamud.Plugin;
 using Dalamud.Plugin.Services;
+using FFXIVClientStructs.FFXIV.Client.Game.InstanceContent;
+using MultiBoxHelper.IPC;
 
 namespace MultiBoxHelper;
-
-// disable nullable warnings as all of these are injected. if they're missing, we have serious issues.
-#pragma warning disable CS8618
 
 /// <summary>
 /// Static class for holding references to Dalamud interfaces.
@@ -22,4 +21,6 @@ public class Service
     [PluginService] public static IPluginLog Log { get; private set; } = null!;
     [PluginService] public static ITargetManager Targets { get; private set; } = null!;
     [PluginService] public static ITextureProvider Textures { get; private set; } = null!;
+    [PluginService] public static IChatGui ChatGui { get; private set; } = null!;
+    [PluginService] public static IToastGui ToastGui { get; private set; } = null!;
 }

@@ -1,8 +1,8 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
   <Import Project="Dalamud.Plugin.Bootstrap.targets" />
   <PropertyGroup>
-    <Version>0.3.0.0</Version>
+    <Version>0.3.0.1</Version>
     <Description>Extra tools for multibox Barding.</Description>
     <PackageProjectUrl>https://github.com/Ramava-Bray-Music/MultiBoxHelper</PackageProjectUrl>
     <PackageLicenseExpression>AGPL-3.0-or-later</PackageLicenseExpression>
@@ -15,20 +15,14 @@
     <Title>Multibox Helper Plugin</Title>
     <Copyright>(c) 2024 Ramava Bray</Copyright>
     <PackageTags>plugin;multibox;bard</PackageTags>
-    <AssemblyVersion>0.3.0.0</AssemblyVersion>
-    <FileVersion>0.3.0.0</FileVersion>
+    <AssemblyVersion>0.3.0.1</AssemblyVersion>
+    <FileVersion>0.3.0.1</FileVersion>
     <ShouldCreateLogs>True</ShouldCreateLogs>
     <AdvancedSettingsExpanded>True</AdvancedSettingsExpanded>
     <UpdateAssemblyVersion>True</UpdateAssemblyVersion>
     <UpdateAssemblyFileVersion>True</UpdateAssemblyFileVersion>
     <UpdateAssemblyInfoVersion>False</UpdateAssemblyInfoVersion>
     <UpdatePackageVersion>True</UpdatePackageVersion>
-    <AssemblyInfoVersionType>SettingsVersion</AssemblyInfoVersionType>
-    <InheritWinAppVersionFrom>None</InheritWinAppVersionFrom>
-    <PackageVersionSettings>AssemblyVersion.None.None</PackageVersionSettings>
-    <PrimaryVersionType>AssemblyVersionAttribute</PrimaryVersionType>
-    <AssemblyVersionSettings>IncrementOnDemand.IncrementOnDemandWithResetOnIncrease.IncrementOnDemandWithResetOnIncrease.IncrementOnDemandWithResetOnIncrease</AssemblyVersionSettings>
-    <AssemblyFileVersionSettings>IncrementOnDemandWithResetOnIncrease.IncrementOnDemandWithResetOnIncrease.IncrementOnDemandWithResetOnIncrease.IncrementOnDemandWithResetOnIncrease</AssemblyFileVersionSettings>
   </PropertyGroup>
   <ItemGroup>
     <None Remove="Data\BardGraphicsSettings.json" />
@@ -53,6 +47,7 @@
       <Pack>True</Pack>
       <PackagePath>\</PackagePath>
     </None>
+    <None Include="C:\Users\jessica.HOME\source\repos\Ramava-Bray-Music\MultiBoxHelper\MultiBoxHelper\.editorconfig" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="images\bard.png">
@@ -63,8 +58,16 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="protobuf-net" Version="3.2.30" />
+    <PackageReference Include="protobuf-net.Core" Version="3.2.30" />
+    <PackageReference Include="TinyIpc" Version="4.3.1" />
+  </ItemGroup>
+  <ItemGroup>
     <None Update="MultiBoxHelper.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <EditorConfigFiles Remove="C:\Users\jessica.HOME\source\repos\Ramava-Bray-Music\MultiBoxHelper\MultiBoxHelper\.editorconfig" />
   </ItemGroup>
 </Project>
