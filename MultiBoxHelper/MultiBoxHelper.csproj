@@ -58,6 +58,8 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="Lumina" Version="4.1.0" />
+    <PackageReference Include="Lumina.Excel" Version="6.5.2" />
     <PackageReference Include="protobuf-net" Version="3.2.30" />
     <PackageReference Include="protobuf-net.Core" Version="3.2.30" />
     <PackageReference Include="TinyIpc" Version="4.3.1" />

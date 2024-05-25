@@ -8,6 +8,24 @@
         "resolved": "2.1.12",
         "contentHash": "Sc0PVxvgg4NQjcI8n10/VfUQBAS4O+Fw2pZrAqBdRMbthYGeogzu5+xmIGCGmsEZ/ukMOBuAqiNiB5qA3MRalg=="
       },
+      "Lumina": {
+        "type": "Direct",
+        "requested": "[4.1.0, )",
+        "resolved": "4.1.0",
+        "contentHash": "bl+CdE2TXGU6aUCiqcrqiiiXJ0eGpfK0c+CwvCL+SY78ydV/zMqLH61XsU1+4CsjSU1+jDiRlLw2/0bIIE6guQ==",
+        "dependencies": {
+          "Microsoft.Extensions.ObjectPool": "9.0.0-preview.1.24081.5"
+        }
+      },
+      "Lumina.Excel": {
+        "type": "Direct",
+        "requested": "[6.5.2, )",
+        "resolved": "6.5.2",
+        "contentHash": "4bKX6ImW885rrgrasNve774FT3f0rjpsuoPltr0V0mxD3Ss5bFGwPQBvzgaio8sJyRNpFa25tMcwXTTKRNe+5g==",
+        "dependencies": {
+          "Lumina": "3.15.2"
+        }
+      },
       "protobuf-net": {
         "type": "Direct",
         "requested": "[3.2.30, )",
@@ -66,6 +84,11 @@
         "dependencies": {
           "Microsoft.Extensions.DependencyInjection.Abstractions": "8.0.1"
         }
+      },
+      "Microsoft.Extensions.ObjectPool": {
+        "type": "Transitive",
+        "resolved": "9.0.0-preview.1.24081.5",
+        "contentHash": "aAR7YW+pUUdvHk3vj7GtAi71dWGDIuY9270lsmQ6lKw23zzY+r8pLP3cGNbJdlnA9VWl+S+gnIVkBCqj2ROlEg=="
       },
       "Microsoft.Extensions.Options": {
         "type": "Transitive",
