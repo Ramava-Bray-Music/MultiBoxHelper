@@ -51,21 +51,19 @@ public class ConfigWindow : Window, IDisposable
             MinimumSize = new Vector2(550, 500)
         };*/
 
-        if (Plugin.Configuration.pluginInterface != null)
+        foreach (var name in iconNames)
         {
-            foreach (var name in iconNames)
-            {
-                // Load images for buttons
-                var file = new FileInfo(Path.Combine(Plugin.Configuration.pluginInterface.AssemblyLocation.Directory?.FullName!, $"images/{name}.png"));
+            // Load images for buttons
+            var file = new FileInfo(Path.Combine(Service.PluginInterface.AssemblyLocation.Directory?.FullName!, $"images/{name}.png"));
 
-                // ITextureProvider takes care of the image caching and dispose
-                images[name] = Service.Textures.GetTextureFromFile(file);
-                if (images[name] == null)
-                {
-                    Service.Log.Debug($"Couldn't load image for {name}.");
-                }
+            // ITextureProvider takes care of the image caching and dispose
+            images[name] = Service.Textures.GetTextureFromFile(file);
+            if (images[name] == null)
+            {
+                Service.Log.Debug($"Couldn't load image for {name}.");
             }
         }
+
     }
 
     public void Dispose()

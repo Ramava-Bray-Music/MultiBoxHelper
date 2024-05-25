@@ -53,20 +53,12 @@ public class Configuration : IPluginConfiguration
     public Dictionary<uint, List<string>> CloneCharacterList { get; set; } = [];
 
     // the below exist just to make saving less cumbersome
-    [NonSerialized]
-    internal DalamudPluginInterface? pluginInterface;
-
-    public void Initialize(DalamudPluginInterface pluginInterface)
-    {
-        this.pluginInterface = pluginInterface;
-    }
-
     public void Save()
     {
-        pluginInterface!.SavePluginConfig(this);
+        Service.PluginInterface.SavePluginConfig(this);
         try
         {
-            // TODO: Trigger event to sync
+            // Trigger event to sync
             IpcHandles.SyncAllSettings();
         }
         catch (IpcNotReadyError)

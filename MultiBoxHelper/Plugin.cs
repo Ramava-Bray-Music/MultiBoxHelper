@@ -79,7 +79,6 @@ public sealed class Plugin : IDalamudPlugin
         {
             Configuration = (Configuration)config;
         }
-        Configuration.Initialize(pluginInterface);
 
         ConfigWindow = new ConfigWindow(this);
         WindowSystem.AddWindow(ConfigWindow);

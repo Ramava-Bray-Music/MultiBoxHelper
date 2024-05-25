@@ -39,6 +39,8 @@ static class IpcHandles
     [IpcHandle(MessageTypeCode.SyncAllSettings)]
     private static void HandleSyncAllSettings(IpcEnvelope message)
     {
+        if (message.StringData == null) { return; }
+
         var str = message.StringData[0];
         var jsonDeserialize = str.JsonDeserialize<Settings.Configuration>();
         Plugin.UpdateConfiguration(jsonDeserialize);
