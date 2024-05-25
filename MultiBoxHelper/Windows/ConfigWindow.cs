@@ -13,7 +13,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Numerics;
-using static FFXIVClientStructs.FFXIV.Client.UI.Misc.DataCenterHelper;
 using World = Lumina.Excel.GeneratedSheets.World;
 
 namespace MultiBoxHelper.Windows;
@@ -36,10 +35,9 @@ public class ConfigWindow : Window, IDisposable
     private bool showAddCloneModal = false;
 
     // For manually adding characters, probably need to rename them
-    public uint DataCenter = Plugin.Configuration.LastUsedDataCenter;
-    public uint World = Plugin.Configuration.LastUsedWorld;
-    public string CharacterName = string.Empty;
-    //public uint CharacterSlot;
+    public uint selectedAddDataCenter = Plugin.Configuration.LastUsedDataCenter;
+    public uint selectedAddWorld = Plugin.Configuration.LastUsedWorld;
+    public string selectedAddCharacterName = string.Empty;
 
     private Dictionary<string, IDalamudTextureWrap?> images { get; set; } = [];
 
@@ -411,22 +409,22 @@ public class ConfigWindow : Window, IDisposable
         var worldSheet = Service.Data.Excel.GetSheet<World>();
         if (worldSheet == null) return;
 
-        var currentDc = dcSheet.GetRow(DataCenter);
+        var currentDc = dcSheet.GetRow(selectedAddDataCenter);
         if (currentDc == null)
         {
-            DataCenter = 0;
+            selectedAddDataCenter = 0;
             return;
         }
 
         ImGui.Text("Add a clone character by name and world");
 
-        if (ImGui.BeginCombo("Data Center", DataCenter == 0 ? "Not Selected" : currentDc.Name.RawString))
+        if (ImGui.BeginCombo("Data Center", selectedAddDataCenter == 0 ? "Not Selected" : currentDc.Name.RawString))
         {
             foreach (var dc in dcSheet.Where(w => w.Region > 0 && w.Name.RawString.Trim().Length > 0))
             {
-                if (ImGui.Selectable(dc.Name.RawString, dc.RowId == DataCenter))
+                if (ImGui.Selectable(dc.Name.RawString, dc.RowId == selectedAddDataCenter))
                 {
-                    DataCenter = dc.RowId;
+                    selectedAddDataCenter = dc.RowId;
                     // TODO: Save this for next time (in config file)
                     //Save();
                 }
@@ -437,20 +435,20 @@ public class ConfigWindow : Window, IDisposable
         if (currentDc.Region != 0)
         {
 
-            var currentWorld = worldSheet.GetRow(World);
-            if (currentWorld == null || (World != 0 && currentWorld.DataCenter.Row != DataCenter))
+            var currentWorld = worldSheet.GetRow(selectedAddWorld);
+            if (currentWorld == null || (selectedAddWorld != 0 && currentWorld.DataCenter.Row != selectedAddDataCenter))
             {
-                World = 0;
+                selectedAddWorld = 0;
                 return;
             }
 
-            if (ImGui.BeginCombo("World", World == 0 ? "Not Selected" : currentWorld.Name.RawString))
+            if (ImGui.BeginCombo("World", selectedAddWorld == 0 ? "Not Selected" : currentWorld.Name.RawString))
             {
-                foreach (var w in worldSheet.Where(w => w.DataCenter.Row == DataCenter && w.IsPublic))
+                foreach (var w in worldSheet.Where(w => w.DataCenter.Row == selectedAddDataCenter && w.IsPublic))
                 {
-                    if (ImGui.Selectable(w.Name.RawString, w.RowId == World))
+                    if (ImGui.Selectable(w.Name.RawString, w.RowId == selectedAddWorld))
                     {
-                        World = w.RowId;
+                        selectedAddWorld = w.RowId;
                         // TODO: Save this as a default too?
                         //Save();
                     }
@@ -460,7 +458,7 @@ public class ConfigWindow : Window, IDisposable
 
             if (currentWorld.IsPublic)
             {
-                ImGui.InputText("Character Name", ref CharacterName, 45);
+                ImGui.InputText("Character Name", ref selectedAddCharacterName, 45);
             }
         }
 
@@ -470,15 +468,11 @@ public class ConfigWindow : Window, IDisposable
             ImGui.CloseCurrentPopup();
             showAddCloneModal = false;
 
-            if (Plugin.Configuration.AddClone(World, CharacterName))
+            if (AddClone(selectedAddWorld, selectedAddCharacterName))
             {
-                selectedWorld = World;
-                selectedClone = CharacterName;
-                CharacterName = string.Empty;
-
                 // Save datacenter and world selection for next time.
-                Plugin.Configuration.LastUsedDataCenter = DataCenter;
-                Plugin.Configuration.LastUsedWorld = World;
+                Plugin.Configuration.LastUsedDataCenter = selectedAddDataCenter;
+                Plugin.Configuration.LastUsedWorld = selectedAddWorld;
                 Plugin.Configuration.Save();
             }
             else
@@ -509,6 +503,9 @@ public class ConfigWindow : Window, IDisposable
             Plugin.Configuration.RemoveClone(worldId, clone);
             selectedClone = string.Empty;
             selectedWorld = 0;
+
+            // Save config changes
+            Plugin.Configuration.Save();
         }
     }
 
@@ -516,20 +513,38 @@ public class ConfigWindow : Window, IDisposable
     /// Add a clone to the list from a game object
     /// </summary>
     /// <param name="pc">player character object</param>
-    private void AddClone(GameObject? clone)
+    private bool AddClone(GameObject? clone)
     {
         if (clone != null && clone is PlayerCharacter pc)
         {
-            Plugin.Configuration.AddClone(pc);
-            selectedClone = pc.Name.TextValue;
-            selectedWorld = pc.HomeWorld.Id;
+            if (Plugin.Configuration.AddClone(pc))
+            {
+                selectedClone = pc.Name.TextValue;
+                selectedWorld = pc.HomeWorld.Id;
+
+                // Save config changes
+                Plugin.Configuration.Save();
+
+                return true;
+            }
         }
+
+        return false;
     }
 
-    private void AddClone(uint world, string clone)
+    private bool AddClone(uint world, string clone)
     {
-        Plugin.Configuration.AddClone(world, clone);
-        selectedWorld = world;
-        selectedClone = clone;
+        if (Plugin.Configuration.AddClone(world, clone))
+        {
+            selectedWorld = world;
+            selectedClone = clone;
+            selectedAddCharacterName = string.Empty;
+
+            // Save config changes
+            Plugin.Configuration.Save();
+
+            return true;
+        }
+        return false;
     }
 }
