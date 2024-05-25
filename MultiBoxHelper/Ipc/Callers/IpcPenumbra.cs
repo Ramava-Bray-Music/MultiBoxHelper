@@ -12,17 +12,17 @@ namespace MultiBoxHelper.Ipc.Callers;
 public sealed class IpcPenumbra : IIpcCaller
 {
     //private ILogger Logger { get; init; }
-    private readonly ApiVersion penumbraApiVersion;
-    private readonly GetEnabledState penumbraEnabled;
-
+    private readonly ApiVersion apiVersion;
+    private readonly GetEnabledState getEnabledState;
+    
     public bool IsAvailable { get; private set; }
     public bool IsEnabled { get; private set; }
 
     public IpcPenumbra()
     {
         //Logger = logger;
-        penumbraApiVersion = new(Service.PluginInterface);
-        penumbraEnabled = new(Service.PluginInterface);
+        apiVersion = new(Service.PluginInterface);
+        getEnabledState = new(Service.PluginInterface);
 
         CheckAPI();
     }
@@ -37,8 +37,10 @@ public sealed class IpcPenumbra : IIpcCaller
                 ?.Version ?? new Version(0, 0, 0, 0));
             penumbraAvailable = penumbraVersion >= new Version(1, 0, 1, 0);
 
+            
+
             IsAvailable = penumbraAvailable;
-            IsEnabled = penumbraAvailable && penumbraEnabled.Invoke();
+            IsEnabled = penumbraAvailable && getEnabledState.Invoke();
         }
         catch
         {
