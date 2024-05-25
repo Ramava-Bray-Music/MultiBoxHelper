@@ -64,10 +64,8 @@ public sealed class Plugin : IDalamudPlugin
 
     public readonly WindowSystem WindowSystem = new("MultiBoxHelper");
 
-    private ConfigWindow ConfigWindow
-    {
-        get; init;
-    }
+    private ConfigWindow ConfigWindow { get; init; }
+    public AddCloneWindow AddCloneWindow { get; init; }
 
     public Plugin(
         [RequiredVersion("1.0")] DalamudPluginInterface pluginInterface)
@@ -81,7 +79,10 @@ public sealed class Plugin : IDalamudPlugin
         }
 
         ConfigWindow = new ConfigWindow(this);
+        AddCloneWindow = new AddCloneWindow(this);
+
         WindowSystem.AddWindow(ConfigWindow);
+        WindowSystem.AddWindow(AddCloneWindow);
 
         _ = Service.CommandManager.AddHandler(CommandName, new CommandInfo(OnCommand)
         {

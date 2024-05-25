@@ -7,6 +7,7 @@ using MultiBoxHelper.Ipc;
 using System;
 using System.Collections.Generic;
 using System.Numerics;
+using System.Xml.Linq;
 
 namespace MultiBoxHelper.Settings;
 
@@ -23,7 +24,7 @@ public class Configuration : IPluginConfiguration
     private readonly ICallGateSubscriber<bool, int, string> configurationChanged = Service.PluginInterface.GetIpcSubscriber<bool, int, string>(ConfigurationChangedIPC);
 
     // Update when this changes
-    public int Version { get; set; } = 2024052105;
+    public int Version { get; set; } = 2024052501;
 
     public ModeConfiguration DefaultModeConfiguration { get; set; } = new ModeConfiguration(Mode.Default);
     public ModeConfiguration BardModeConfiguration { get; set; } = new ModeConfiguration(Mode.Bard);
@@ -46,6 +47,10 @@ public class Configuration : IPluginConfiguration
             };
         }
     }
+
+    // Some default values for adding clones by name (and eventually auto login stuff)
+    public uint LastUsedDataCenter;
+    public uint LastUsedWorld;
 
     /// <summary>
     /// List of clone characters
@@ -71,22 +76,31 @@ public class Configuration : IPluginConfiguration
     /// Add a clone character to the list based on a PlayerCharacter GameObject.
     /// </summary>
     /// <param name="character"></param>
-    public void AddClone(PlayerCharacter character)
+    public bool AddClone(PlayerCharacter character)
+    {
+        return AddClone(character.HomeWorld.Id, character.Name.TextValue);
+    }
+
+    public bool AddClone(uint world, string clone)
     {
         // TODO: Should be providing feedback if any of this fails.
-        var world = character.HomeWorld.Id;
-        var name = character.Name.TextValue;
-
         // Need to make sure there's a sublist for that world first
         if (!CloneCharacterList.TryGetValue(world, out var value))
         {
             value = ([]);
             CloneCharacterList[world] = value;
         }
-        if (!value.Contains(name))
+
+        // Validate character exists
+
+
+        if (!value.Contains(clone))
         {
-            value.Add(name);
+            value.Add(clone);
         }
+
+        // Not sure we can fail yet
+        return true;
     }
 
     /// <summary>

@@ -6,11 +6,14 @@ using Dalamud.Interface.Internal;
 using Dalamud.Interface.Utility;
 using Dalamud.Interface.Windowing;
 using ImGuiNET;
+using Lumina.Excel.GeneratedSheets;
 using MultiBoxHelper.Settings;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Numerics;
+using static FFXIVClientStructs.FFXIV.Client.UI.Misc.DataCenterHelper;
 using World = Lumina.Excel.GeneratedSheets.World;
 
 namespace MultiBoxHelper.Windows;
@@ -29,6 +32,14 @@ public class ConfigWindow : Window, IDisposable
     // selected entry in clone list
     private string selectedClone = string.Empty;
     private uint selectedWorld = 0;
+
+    private bool showAddCloneModal = false;
+
+    // For manually adding characters, probably need to rename them
+    public uint DataCenter = Plugin.Configuration.LastUsedDataCenter;
+    public uint World = Plugin.Configuration.LastUsedWorld;
+    public string CharacterName = string.Empty;
+    //public uint CharacterSlot;
 
     private Dictionary<string, IDalamudTextureWrap?> images { get; set; } = [];
 
@@ -76,7 +87,7 @@ public class ConfigWindow : Window, IDisposable
     /// </summary>
     public override void Draw()
     {
-
+        DrawAddCloneModal();
         // Character list
         ImGui.BeginGroup();
         {
@@ -90,6 +101,22 @@ public class ConfigWindow : Window, IDisposable
             ImGui.Spacing();
             ImGui.Spacing();
             ImGui.SameLine(20);
+            // Add current player character
+            if (ImGuiComponents.IconButton(FontAwesomeIcon.Plus))
+            {
+                if (Service.ClientState != null)
+                {
+                    showAddCloneModal = true;
+                    //plugin.AddCloneWindow.Position = this.Position;
+                    //plugin.AddCloneWindow.IsOpen = true;
+                }
+            }
+            if (ImGui.IsItemHovered())
+            {
+                ImGui.SetTooltip("Add new character");
+            }
+            ImGui.SameLine();
+
             // Add current player character
             if (ImGuiComponents.IconButton(FontAwesomeIcon.User))
             {
@@ -156,7 +183,6 @@ public class ConfigWindow : Window, IDisposable
         {
             ImGui.SetTooltip("Save and Close");
         }
-
         ImGui.EndGroup();
 #if DEBUG
         //ImGui.BeginGroup();
@@ -202,7 +228,7 @@ public class ConfigWindow : Window, IDisposable
 
             if (ImGui.IsItemHovered())
             {
-                ImGui.SetTooltip("Switch to Default mode");
+                ImGui.SetTooltip($"Switch to {mode} mode");
             }
 
             if (disabled)
@@ -368,6 +394,109 @@ public class ConfigWindow : Window, IDisposable
 
     }
 
+    private void DrawAddCloneModal()
+    {
+        if (showAddCloneModal)
+        {
+            ImGui.OpenPopup("Add a Clone");
+        }
+
+        if (!ImGui.BeginPopupModal("Add a Clone", ref showAddCloneModal, ImGuiWindowFlags.AlwaysAutoResize))
+        {
+            return;
+        }
+
+        var dcSheet = Service.Data.Excel.GetSheet<WorldDCGroupType>();
+        if (dcSheet == null) return;
+        var worldSheet = Service.Data.Excel.GetSheet<World>();
+        if (worldSheet == null) return;
+
+        var currentDc = dcSheet.GetRow(DataCenter);
+        if (currentDc == null)
+        {
+            DataCenter = 0;
+            return;
+        }
+
+        ImGui.Text("Add a clone character by name and world");
+
+        if (ImGui.BeginCombo("Data Center", DataCenter == 0 ? "Not Selected" : currentDc.Name.RawString))
+        {
+            foreach (var dc in dcSheet.Where(w => w.Region > 0 && w.Name.RawString.Trim().Length > 0))
+            {
+                if (ImGui.Selectable(dc.Name.RawString, dc.RowId == DataCenter))
+                {
+                    DataCenter = dc.RowId;
+                    // TODO: Save this for next time (in config file)
+                    //Save();
+                }
+            }
+            ImGui.EndCombo();
+        }
+
+        if (currentDc.Region != 0)
+        {
+
+            var currentWorld = worldSheet.GetRow(World);
+            if (currentWorld == null || (World != 0 && currentWorld.DataCenter.Row != DataCenter))
+            {
+                World = 0;
+                return;
+            }
+
+            if (ImGui.BeginCombo("World", World == 0 ? "Not Selected" : currentWorld.Name.RawString))
+            {
+                foreach (var w in worldSheet.Where(w => w.DataCenter.Row == DataCenter && w.IsPublic))
+                {
+                    if (ImGui.Selectable(w.Name.RawString, w.RowId == World))
+                    {
+                        World = w.RowId;
+                        // TODO: Save this as a default too?
+                        //Save();
+                    }
+                }
+                ImGui.EndCombo();
+            }
+
+            if (currentWorld.IsPublic)
+            {
+                ImGui.InputText("Character Name", ref CharacterName, 45);
+            }
+        }
+
+
+        if (ImGui.Button("Add"))
+        {
+            ImGui.CloseCurrentPopup();
+            showAddCloneModal = false;
+
+            if (Plugin.Configuration.AddClone(World, CharacterName))
+            {
+                selectedWorld = World;
+                selectedClone = CharacterName;
+                CharacterName = string.Empty;
+
+                // Save datacenter and world selection for next time.
+                Plugin.Configuration.LastUsedDataCenter = DataCenter;
+                Plugin.Configuration.LastUsedWorld = World;
+                Plugin.Configuration.Save();
+            }
+            else
+            {
+                Service.Log.Error("Character does not exist.");
+            }
+        }
+        ImGui.SameLine();
+
+        if (ImGui.Button("Cancel"))
+        {
+            showAddCloneModal = false;
+            ImGui.CloseCurrentPopup();
+        }
+
+        ImGui.EndPopup();
+    }
+
     /// <summary>
     /// Remove clone from configuration
     /// </summary>
@@ -395,5 +524,12 @@ public class ConfigWindow : Window, IDisposable
             selectedClone = pc.Name.TextValue;
             selectedWorld = pc.HomeWorld.Id;
         }
+    }
+
+    private void AddClone(uint world, string clone)
+    {
+        Plugin.Configuration.AddClone(world, clone);
+        selectedWorld = world;
+        selectedClone = clone;
     }
 }
