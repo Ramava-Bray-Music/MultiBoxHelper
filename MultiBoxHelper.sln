@@ -32,16 +32,32 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "images", "images", "{9B4542
 		images\multiboxhelper.png = images\multiboxhelper.png
 	EndProjectSection
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Penumbra.Api", "Penumbra.Api\Penumbra.Api.csproj", "{A17F0AD8-5D82-4381-A8D6-ED6A8C5F18F8}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
 		Debug|x64 = Debug|x64
+		Release|Any CPU = Release|Any CPU
 		Release|x64 = Release|x64
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{13C812E9-0D42-4B95-8646-40EEBF30636F}.Debug|Any CPU.ActiveCfg = Debug|x64
+		{13C812E9-0D42-4B95-8646-40EEBF30636F}.Debug|Any CPU.Build.0 = Debug|x64
 		{13C812E9-0D42-4B95-8646-40EEBF30636F}.Debug|x64.ActiveCfg = Debug|x64
 		{13C812E9-0D42-4B95-8646-40EEBF30636F}.Debug|x64.Build.0 = Debug|x64
+		{13C812E9-0D42-4B95-8646-40EEBF30636F}.Release|Any CPU.ActiveCfg = Release|x64
+		{13C812E9-0D42-4B95-8646-40EEBF30636F}.Release|Any CPU.Build.0 = Release|x64
 		{13C812E9-0D42-4B95-8646-40EEBF30636F}.Release|x64.ActiveCfg = Release|x64
 		{13C812E9-0D42-4B95-8646-40EEBF30636F}.Release|x64.Build.0 = Release|x64
+		{A17F0AD8-5D82-4381-A8D6-ED6A8C5F18F8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A17F0AD8-5D82-4381-A8D6-ED6A8C5F18F8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A17F0AD8-5D82-4381-A8D6-ED6A8C5F18F8}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{A17F0AD8-5D82-4381-A8D6-ED6A8C5F18F8}.Debug|x64.Build.0 = Debug|Any CPU
+		{A17F0AD8-5D82-4381-A8D6-ED6A8C5F18F8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A17F0AD8-5D82-4381-A8D6-ED6A8C5F18F8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A17F0AD8-5D82-4381-A8D6-ED6A8C5F18F8}.Release|x64.ActiveCfg = Release|Any CPU
+		{A17F0AD8-5D82-4381-A8D6-ED6A8C5F18F8}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
