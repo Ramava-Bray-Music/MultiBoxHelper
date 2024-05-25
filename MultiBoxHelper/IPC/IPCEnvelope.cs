@@ -36,7 +36,7 @@ internal class IpcEnvelope
 
     public static IpcEnvelope Create<T>(MessageTypeCode messageType, T data) where T : unmanaged => new(messageType, data.ToBytesUnmanaged());
     public static IpcEnvelope Create(MessageTypeCode messageType, byte[] data) => new(messageType, data);
-    public static IpcEnvelope Create(MessageTypeCode messageType, params string[] stringData) => new(messageType, null, stringData);
+    public static IpcEnvelope Create(MessageTypeCode messageType, params string[] stringData) => new(messageType, [], stringData);
     public void BroadCast(bool includeSelf = false)
     {
         var sw = Stopwatch.StartNew();
@@ -86,8 +86,8 @@ internal class IpcEnvelope
         get; init;
     }
     [ProtoMember(6)]
-    public string[] StringData
+    public string[]? StringData
     {
         get; init;
-    }
+    } 
 }
