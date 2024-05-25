@@ -52,13 +52,20 @@ public static class SettingsManager
     /// <param name="disable"></param>
     public static void DisablePenumbra(bool disable = true)
     {
+        Plugin.IpcManager.Penumbra.CheckAPI();
         if (disable)
         {
-            Service.CommandManager.ProcessCommand("/penumbra disable");
+            if (Plugin.IpcManager.Penumbra.IsEnabled)
+            {
+                Service.CommandManager.ProcessCommand("/penumbra disable");
+            }
         }
         else
         {
-            Service.CommandManager.ProcessCommand("/penumbra enable");
+            if (Plugin.IpcManager.Penumbra.IsAvailable && !Plugin.IpcManager.Penumbra.IsEnabled)
+            {
+                Service.CommandManager.ProcessCommand("/penumbra enable");
+            }
         }
     }
 

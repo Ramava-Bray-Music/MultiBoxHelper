@@ -15,7 +15,8 @@ public sealed class IpcPenumbra : IIpcCaller
     private readonly ApiVersion penumbraApiVersion;
     private readonly GetEnabledState penumbraEnabled;
 
-    public bool APIAvailable { get; private set; }
+    public bool IsAvailable { get; private set; }
+    public bool IsEnabled { get; private set; }
 
     public IpcPenumbra()
     {
@@ -36,12 +37,13 @@ public sealed class IpcPenumbra : IIpcCaller
                 ?.Version ?? new Version(0, 0, 0, 0));
             penumbraAvailable = penumbraVersion >= new Version(1, 0, 1, 0);
 
-            penumbraAvailable &= penumbraEnabled.Invoke();
-            APIAvailable = penumbraAvailable;
+            IsAvailable = penumbraAvailable;
+            IsEnabled = penumbraAvailable && penumbraEnabled.Invoke();
         }
         catch
         {
-            APIAvailable = penumbraAvailable;
+            IsAvailable = penumbraAvailable;
+            IsEnabled = penumbraAvailable;
         }
     }
 }

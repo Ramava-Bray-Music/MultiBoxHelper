@@ -7,6 +7,6 @@ using System.Threading.Tasks;
 namespace MultiBoxHelper.Ipc.Callers;
 public interface IIpcCaller
 {
-    bool APIAvailable { get; }
+    bool IsAvailable { get; }
     void CheckAPI();
 }
