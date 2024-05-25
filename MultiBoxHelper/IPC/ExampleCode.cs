@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Lumina.Excel.GeneratedSheets2;
 
-namespace MultiBoxHelper.IPC;
+namespace MultiBoxHelper.Ipc;
 public class Teleporter
 {
     private readonly ICallGateSubscriber<uint, byte, bool> teleportIpc = Service.PluginInterface.GetIpcSubscriber<uint, byte, bool>("Teleport");

@@ -70,4 +70,7 @@
   <ItemGroup>
     <EditorConfigFiles Remove="C:\Users\jessica.HOME\source\repos\Ramava-Bray-Music\MultiBoxHelper\MultiBoxHelper\.editorconfig" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Penumbra.Api\Penumbra.Api.csproj" />
+  </ItemGroup>
 </Project>

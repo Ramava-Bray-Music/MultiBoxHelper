@@ -3,7 +3,7 @@ using Dalamud.IoC;
 using Dalamud.Plugin;
 using Dalamud.Plugin.Services;
 using FFXIVClientStructs.FFXIV.Client.Game.InstanceContent;
-using MultiBoxHelper.IPC;
+using MultiBoxHelper.Ipc;
 
 namespace MultiBoxHelper;
 

@@ -20,23 +20,23 @@ using ProtoBuf;
 using System;
 using System.Diagnostics;
 
-namespace MultiBoxHelper.IPC;
+namespace MultiBoxHelper.Ipc;
 
 [ProtoContract]
-internal class IPCEnvelope
+internal class IpcEnvelope
 {
-    public IPCEnvelope(MessageTypeCode messageType, byte[] data, params string[] stringData)
+    public IpcEnvelope(MessageTypeCode messageType, byte[] data, params string[] stringData)
     {
         MessageType = messageType;
         BroadcasterId = (long)Service.ClientState.LocalContentId;
         Data = data;
         StringData = stringData;
     }
-    private IPCEnvelope() { }
+    private IpcEnvelope() { }
 
-    public static IPCEnvelope Create<T>(MessageTypeCode messageType, T data) where T : unmanaged => new(messageType, data.ToBytesUnmanaged());
-    public static IPCEnvelope Create(MessageTypeCode messageType, byte[] data) => new(messageType, data);
-    public static IPCEnvelope Create(MessageTypeCode messageType, params string[] stringData) => new(messageType, null, stringData);
+    public static IpcEnvelope Create<T>(MessageTypeCode messageType, T data) where T : unmanaged => new(messageType, data.ToBytesUnmanaged());
+    public static IpcEnvelope Create(MessageTypeCode messageType, byte[] data) => new(messageType, data);
+    public static IpcEnvelope Create(MessageTypeCode messageType, params string[] stringData) => new(messageType, null, stringData);
     public void BroadCast(bool includeSelf = false)
     {
         var sw = Stopwatch.StartNew();
@@ -44,7 +44,7 @@ internal class IPCEnvelope
         Service.Log.Verbose($"proto serialized in {sw.Elapsed.TotalMilliseconds}ms");
         var serialized = protoSerialize.Compress();
         Service.Log.Verbose($"data compressed in {sw.Elapsed.TotalMilliseconds}ms");
-        Plugin.MultiboxManager.BroadCast(serialized, includeSelf);
+        Plugin.IpcManager.BroadCast(serialized, includeSelf);
     }
 
     public T DataStruct<T>() where T : unmanaged
@@ -57,7 +57,7 @@ internal class IPCEnvelope
         throw new ArgumentNullException();
     }
 
-    public override string ToString() => $"{nameof(IPCEnvelope)}:{TimeStamp:O}:{MessageType}:{BroadcasterId:X}:{Data?.Length}:{StringData?.Length}";
+    public override string ToString() => $"{nameof(IpcEnvelope)}:{TimeStamp:O}:{MessageType}:{BroadcasterId:X}:{Data?.Length}:{StringData?.Length}";
 
     [ProtoMember(1)]
     public MessageTypeCode MessageType

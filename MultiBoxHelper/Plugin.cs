@@ -4,7 +4,7 @@ using Dalamud.Game.Config;
 using Dalamud.Interface.Windowing;
 using Dalamud.IoC;
 using Dalamud.Plugin;
-using MultiBoxHelper.IPC;
+using MultiBoxHelper.Ipc;
 using MultiBoxHelper.Settings;
 using MultiBoxHelper.Windows;
 using System.Diagnostics;
@@ -23,7 +23,7 @@ public sealed class Plugin : IDalamudPlugin
     private Mode currentMode = Mode.Default;
 
     // This is a good place for it, I think?
-    internal static MultiboxManager MultiboxManager { get; private set; } = new MultiboxManager();
+    internal static IpcManager IpcManager { get; private set; } = new IpcManager();
 
     public Mode CurrentMode
     {
@@ -129,9 +129,9 @@ public sealed class Plugin : IDalamudPlugin
     {
         WindowSystem.RemoveAllWindows();
         ConfigWindow.Dispose();
-        if (MultiboxManager != null)
+        if (IpcManager != null)
         {
-            MultiboxManager.Dispose();
+            IpcManager.Dispose();
         }
         Service.CommandManager.RemoveHandler(CommandName);
     }

@@ -19,12 +19,12 @@
 using MultiBoxHelper.Util;
 using System.Buffers;
 
-namespace MultiBoxHelper.IPC;
+namespace MultiBoxHelper.Ipc;
 
-static class IPCHandles
+static class IpcHandles
 {
-    [IPCHandle(MessageTypeCode.Hello)]
-    private static void HandleHello(IPCEnvelope message)
+    [IpcHandle(MessageTypeCode.Hello)]
+    private static void HandleHello(IpcEnvelope message)
     {
         // Currently does nothing?
         _ = new ArrayBufferWriter<byte>();
@@ -33,11 +33,11 @@ static class IPCHandles
     public static void SyncAllSettings()
     {
         var config = Plugin.Configuration.JsonSerialize();
-        IPCEnvelope.Create(MessageTypeCode.SyncAllSettings, config).BroadCast();
+        IpcEnvelope.Create(MessageTypeCode.SyncAllSettings, config).BroadCast();
     }
 
-    [IPCHandle(MessageTypeCode.SyncAllSettings)]
-    private static void HandleSyncAllSettings(IPCEnvelope message)
+    [IpcHandle(MessageTypeCode.SyncAllSettings)]
+    private static void HandleSyncAllSettings(IpcEnvelope message)
     {
         var str = message.StringData[0];
         var jsonDeserialize = str.JsonDeserialize<Settings.Configuration>();

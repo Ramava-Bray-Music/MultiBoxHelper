@@ -3,7 +3,7 @@ using Dalamud.Game.ClientState.Objects.SubKinds;
 using Dalamud.Plugin;
 using Dalamud.Plugin.Ipc;
 using Dalamud.Plugin.Ipc.Exceptions;
-using MultiBoxHelper.IPC;
+using MultiBoxHelper.Ipc;
 using System;
 using System.Collections.Generic;
 using System.Numerics;
@@ -67,7 +67,7 @@ public class Configuration : IPluginConfiguration
         try
         {
             // TODO: Trigger event to sync
-            IPCHandles.SyncAllSettings();
+            IpcHandles.SyncAllSettings();
         }
         catch (IpcNotReadyError)
         {

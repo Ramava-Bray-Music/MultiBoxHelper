@@ -17,10 +17,10 @@
 // This code was originally written by akira0245 and was originally used in the MidiBard project. Any usage of this code must prominently credit the author, akira0245, and indicate that it was originally used in the MidiBard project.
 using System;
 
-namespace MultiBoxHelper.IPC
+namespace MultiBoxHelper.Ipc
 {
     [AttributeUsage(AttributeTargets.Method)]
-    internal class IPCHandleAttribute(MessageTypeCode typeCode) : Attribute
+    internal class IpcHandleAttribute(MessageTypeCode typeCode) : Attribute
     {
         public MessageTypeCode TypeCode
         {

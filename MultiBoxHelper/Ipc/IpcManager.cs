@@ -28,32 +28,37 @@ using TinyIpc.Messaging;
 using MultiBoxHelper.Util;
 using System.IO.Compression;
 using System.IO;
+using MultiBoxHelper.Ipc.Callers;
 
-namespace MultiBoxHelper.IPC;
+namespace MultiBoxHelper.Ipc;
 
-internal class MultiboxManager : IDisposable
+internal class IpcManager : IDisposable
 {
     private readonly bool initFailed;
     private bool messagesQueueRunning = true;
     private readonly TinyMessageBus? messageBus;
     private readonly ConcurrentQueue<(byte[] serialized, bool includeSelf)> messageQueue = new();
     private readonly AutoResetEvent autoResetEvent = new(false);
-    private readonly Dictionary<MessageTypeCode, Action<IPCEnvelope>>? methodInfos;
+    private readonly Dictionary<MessageTypeCode, Action<IpcEnvelope>>? methodInfos;
 
-    internal MultiboxManager()
+    public IpcPenumbra Penumbra { get; private set; }
+
+    internal IpcManager()
     {
+        Penumbra = new();
+
         try
         {
             const long maxFileSize = 1 << 24;
             messageBus = new TinyMessageBus(new TinyMemoryMappedFile("MultiBoxHelper.IPC", maxFileSize), true);
             messageBus.MessageReceived += MessageBus_MessageReceived;
 
-            methodInfos = typeof(IPCHandles)
+            methodInfos = typeof(IpcHandles)
                 .GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static)
-                .Select(i => (i.GetCustomAttribute<IPCHandleAttribute>()?.TypeCode, methodInfo: i))
+                .Select(i => (i.GetCustomAttribute<IpcHandleAttribute>()?.TypeCode, methodInfo: i))
                 .Where(i => i.TypeCode != null)
                 .ToDictionary(i => (MessageTypeCode)i.TypeCode!,
-                    i => i.methodInfo.CreateDelegate<Action<IPCEnvelope>>(null));
+                    i => i.methodInfo.CreateDelegate<Action<IpcEnvelope>>(null));
 
             var thread = new Thread(() =>
             {
@@ -111,6 +116,7 @@ internal class MultiboxManager : IDisposable
     }
 
     // I don't know why the extension doesn't work for me, but this does.
+    // TODO: figure out why the extension doesn't work. Low priority, but still.
     private static byte[] DecompressMessage(byte[] message)
     {
         using MemoryStream memoryStream = new MemoryStream(message);
@@ -134,10 +140,9 @@ internal class MultiboxManager : IDisposable
         {
             var sw = Stopwatch.StartNew();
             Service.Log.Verbose($"message received");
-
             byte[] bytes = DecompressMessage(e.Message.ToArray<byte>());
             Service.Log.Verbose($"message decompressed in {sw.Elapsed.TotalMilliseconds}ms");
-            var message = bytes.ProtoDeserialize<IPCEnvelope>();
+            var message = bytes.ProtoDeserialize<IpcEnvelope>();
             Service.Log.Verbose($"proto deserialized in {sw.Elapsed.TotalMilliseconds}ms");
             ProcessMessage(message);
 
@@ -149,7 +154,7 @@ internal class MultiboxManager : IDisposable
         }
     }
 
-    private void ProcessMessage(IPCEnvelope message)
+    private void ProcessMessage(IpcEnvelope message)
     {
         if (methodInfos != null)
         {
@@ -204,7 +209,7 @@ internal class MultiboxManager : IDisposable
         ReleaseUnmanagedResources(true);
     }
 
-    ~MultiboxManager()
+    ~IpcManager()
     {
         ReleaseUnmanagedResources(false);
     }

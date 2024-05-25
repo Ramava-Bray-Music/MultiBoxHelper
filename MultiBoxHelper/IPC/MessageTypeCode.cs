@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MultiBoxHelper.IPC;
+namespace MultiBoxHelper.Ipc;
 public enum MessageTypeCode
 {
     Hello = 1,
