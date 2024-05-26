@@ -24,7 +24,7 @@ public class Configuration : IPluginConfiguration
     private readonly ICallGateSubscriber<bool, int, string> configurationChanged = Service.PluginInterface.GetIpcSubscriber<bool, int, string>(ConfigurationChangedIPC);
 
     // Update when this changes
-    public int Version { get; set; } = 2024052501;
+    public int Version { get; set; } = 2024052502;
 
     public ModeConfiguration DefaultModeConfiguration { get; set; } = new ModeConfiguration(Mode.Default);
     public ModeConfiguration BardModeConfiguration { get; set; } = new ModeConfiguration(Mode.Bard);
@@ -47,6 +47,10 @@ public class Configuration : IPluginConfiguration
             };
         }
     }
+
+    public bool AutoLogin = false;
+    // Delay before loggin in automatically in seconds.
+    public int AutoLoginDelay = 20;
 
     // Some default values for adding clones by name (and eventually auto login stuff)
     public uint LastUsedDataCenter;

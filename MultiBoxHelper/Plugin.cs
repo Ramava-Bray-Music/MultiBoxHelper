@@ -16,6 +16,8 @@ namespace MultiBoxHelper;
 /// </summary>
 public sealed class Plugin : IDalamudPlugin
 {
+    //internal LoginHandler LoginHandler { get; init; }
+
     private const string CommandName = "/mbh";
     private const string BardModeCommand = "/bardmode";
     private const string CloneModeCommand = "/clonemode";
@@ -56,6 +58,11 @@ public sealed class Plugin : IDalamudPlugin
             CurrentMode = Mode.Bard;
         }
     }
+    
+    private void ToggleTestWindow()
+    {
+        TestWindow.Toggle();
+    }
 
     public static Configuration Configuration
     {
@@ -65,7 +72,7 @@ public sealed class Plugin : IDalamudPlugin
     public readonly WindowSystem WindowSystem = new("MultiBoxHelper");
 
     private ConfigWindow ConfigWindow { get; init; }
-    public AddCloneWindow AddCloneWindow { get; init; }
+    public TestWindow TestWindow { get; init; }
 
     public Plugin(
         [RequiredVersion("1.0")] DalamudPluginInterface pluginInterface)
@@ -79,10 +86,10 @@ public sealed class Plugin : IDalamudPlugin
         }
 
         ConfigWindow = new ConfigWindow(this);
-        AddCloneWindow = new AddCloneWindow(this);
+        TestWindow = new TestWindow(this);
 
         WindowSystem.AddWindow(ConfigWindow);
-        WindowSystem.AddWindow(AddCloneWindow);
+        WindowSystem.AddWindow(TestWindow);
 
         _ = Service.CommandManager.AddHandler(CommandName, new CommandInfo(OnCommand)
         {
@@ -97,9 +104,12 @@ public sealed class Plugin : IDalamudPlugin
         _ = Service.CommandManager.AddHandler(CloneModeCommand, new CommandInfo(OnCloneCommand)
         {
             HelpMessage = "Force Clone Mode to be on."
+#if DEBUG
+        });
+        _ = Service.CommandManager.AddHandler("/clonetest", new CommandInfo(OnCloneTest){
+            HelpMessage = "Open testing window."
         });
 
-#if DEBUG
         _ = Service.CommandManager.AddHandler("/datadump", new CommandInfo(OnDataDump)
         {
             HelpMessage = "Dump diagnostic or testing data we're currently needing."
@@ -120,9 +130,13 @@ public sealed class Plugin : IDalamudPlugin
         Service.ClientState.Login += OnLogin;
 
 #if DEBUG
+        pluginInterface.UiBuilder.OpenMainUi += ToggleTestWindow;
         // For testing purposes at times
         Service.GameConfig.Changed += GameConfig_Changed;
 #endif
+
+        Service.Log.Debug("Initiating AutoLogin handler");
+        //this.LoginHandler = new LoginHandler(this);
     }
 
     public void Dispose()
@@ -168,6 +182,11 @@ public sealed class Plugin : IDalamudPlugin
     }
 
 #if DEBUG
+    private void OnCloneTest(string command, string arguments)
+    {
+        TestWindow.Toggle();
+    }
+
     public bool watchConfigChanges = false;
 
     /// <summary>

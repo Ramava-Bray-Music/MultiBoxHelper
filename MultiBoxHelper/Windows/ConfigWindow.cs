@@ -89,11 +89,25 @@ public class ConfigWindow : Window, IDisposable
         // Character list
         ImGui.BeginGroup();
         {
-            if (ImGui.BeginChild("clone_list", ImGuiHelpers.ScaledVector2(240, -30), true))
+            if (ImGui.BeginChild("clone_list", ImGuiHelpers.ScaledVector2(240, -90), true))
             {
                 DrawCharacterList();
             }
             ImGui.EndChild();
+
+            
+            // Checkbox for enabling auto login for clones
+            ImGui.Checkbox("Automatic login for clones", ref Plugin.Configuration.AutoLogin);
+            if (ImGui.IsItemHovered())
+            {
+                ImGui.SetTooltip("Automatically log clone characters into the game after a short delay.");
+            }
+            ImGui.PushItemWidth(90);
+            ImGui.InputInt("Delay (seconds)", ref Plugin.Configuration.AutoLoginDelay, 1, 5);
+            if (ImGui.IsItemHovered())
+            {
+                ImGui.SetTooltip("Delay after game load before logging in.");
+            }
 
             // Need to add some buttons below
             ImGui.Spacing();
